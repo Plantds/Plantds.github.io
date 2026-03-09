@@ -11,7 +11,6 @@
                     <li class="logo"><a href="index.html">Logo</a></li>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="Projects.html">Projects</a></li>
-                    <li><a href="Education.html">Education</a></li>
                     <li><a href="About_Me.html">About me</a></li>
                     <li><a href="Contact.html">Contact</a></li>
                 </ul>
@@ -225,25 +224,118 @@
                     <div style="background-color: rgba(0, 0, 0, 1.0); width: 700px; border: 3px solid white; padding: 12px; margin: 10px; position: absolute; right: 4.5%; bottom: -613.8%;
                         text-align: left; z-index: 3;">
                         <p>
-                            and this is how we destory the cubes, we have to loops, one the destroys all actors in the debug array and one that destroy all actors of a certain tag.
+                            and this is how we destory the cubes, we have to loops, one that destroys all actors in the debug array and one that destroy all actors of a certain tag.
                         </p>
                     </div>
                 </div>
 
+
+                <div>
+                   <iframe src="video/Entropy/last.mp4" frameborder="0" width="40%" height="40%" style="position: absolute; left: 5%; bottom: -658%; z-index: 1; border: 3px solid white;"></iframe>
+                    <div style="background-color: rgba(0, 0, 0, 1.0); width: 45%; border: 3px solid white; padding: 12px; margin: 10px; position: absolute; right: 4.5%; bottom: -658.9%;
+                        text-align: left; z-index: 3;">
+                        <p>
+                            This is what it looked like in game
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="https://nickzouk.itch.io/entropy"><img src="images/bug.png" alt="" style="position: absolute; right: 17%; bottom: -647%; width: 20%;"></a>
+
+                </div>
+                
+                <div>
+                    <div style="background-color: rgba(0, 0, 0, 1.0); width: 89%; border: 3px solid white; padding: 12px; margin: 10px; position: absolute; left: 4.5%; bottom: -676.8%;
+                        text-align: left; z-index: 3;">
+                        <p>
+                            I made this, another platfrom that is very similar and something that didnt get implmented into the game
+                        </p>
+                        <p>
+                            <a href="#un" style="text-decoration: none; color: white;">  Click here to check out unimplmented/unfinnished work</a>
+                        </p>
+                    </div>
+                </div>
                 
 
             </div>
-
+            
         </div>
 
-
-        <div style="height:9000px;">
+        <div style="height:7400px;">
         </div>
 
         <div id="Nau" class="cont" style="list-style: none;">
-            <img src="images/cat.png" alt="">
+            <img src="images/underthewater.png" alt="">
+            <div style="background-color: rgba(0, 0, 0, 1.0); width: 600px; border: 3px solid white; padding: 20px; margin: 20px; position: absolute; left: 1.5%; bottom: 60%;
+                        text-align: left;">
+                <section>
+                    <h1>Nautilus</h1>
+                </section>
+                    <h3> Nautilus was another 9 week project. The game was an atmospheric exploration game where you travel in a sub througth a cave sytem made in unity. I made the sonar system, dialog sytem and a few
+                        unimplmented mechanics. 
+                    </h3>
+            </div>
+
+            <div>
+                <img src="images/sonar.png" alt="" style="position: absolute; right:  5%; bottom: -30%; border: 3px solid white;">
+                <div style="background-color: rgba(0, 0, 0, 1.0); width: 50%; border: 3px solid white; padding: 12px; margin: 10px; position: absolute; left: 4.5%; bottom: -31%;
+                        text-align: left; z-index: 3;">
+                    <p>
+                        now first thing first I will have to confess something. This code was optimized by a friend of mine working on the same project. The basic ground work, the math and logic, are mine
+                        but the reason it doesnt drop our frames to 15 is becouse of a man named <a href="https://fil3sav3d.github.io/" style="text-decoration:  none; color:  white;">Kjell</a>. Ill be showing the start function
+                        as that has not been touched by Kjell at all is 100% my code.
+                    </p>
+                    <p>
+                        So what does this snipit of code do? well CalcualteDegrees calculates what degrees we should send a raycheck out at. Think of how a sonar works in real life by sending out
+                        a sound wave, we instead send out raycast. Raycast are expensive tho and we only need to be so pricese. First we check out the horizontal degrees we should be firing at,
+                        it in a circle so we have to go 360 degrees around but we only want some of these degrees not all 360 of them. We take 360 and divide it by how many we want to get where we should fire.
+                        say we want 15 rays in the horizontal well then we take 360/15 and get 24 meaning that ever 24 degrees we should fire.
+                    </p>
+                    <p>
+                        then we store the start degree, we do this becouse the sub can start rotaeded and this rotation needs to be added the the degrees we will be firing out, otherwise they wont aline with the sub.
+                        after that we create an array of float that is a as big the amunt of rays we want. Then we just create those rays to fill up the array. we do this by simply taking the start 
+                        degree and adding the degree we want to fire at and multiplying it with which degree it should be. Lets say we want to create the third degree in the array with a start degree of 2.4 it would look something like this.
+                        2.4 + (24*3) = 74.4, the third would be 74.4 and you do this till the array is full.
+                    </p>
+                    <p>
+                        vertical is basicly the same so I wont go over it.
+                    </p>
+                    <p>
+                        callcualteTimeBetweenRays, does what it says it do. We take the totall laptime by how many rays exist in the horizontal and then we get the amount of time should be spent per ray.
+                    </p>
+                    <p>
+                        getStartDegrees, is odd and kinda werid but Ill do my best to explain it. It used for set up, it just sets up the degree the sonar is currently att and the degree it should go towards. this was done for the beam and not for the rays.
+                        The sonar visual aspect needed its own code at a times like here.
+                    </p>
+                    <p>
+                        EularToQuternion and ChangeBeamTarget are simple and do what they say so I wont make more of an explnation on them.
+                    </p>
+                </div>
+            </div>
+                <iframe src="video/Nat/dialog.mp4" frameborder="0" width="40%" height="40%" style="position: absolute; right: 5%; bottom: -80%; z-index: 1; border: 3px solid white;"></iframe>
+                    <div style="background-color: rgba(0, 0, 0, 1.0); width: 45%; border: 3px solid white; padding: 12px; margin: 10px; position: absolute; left: 4.5%; bottom: -81%;
+                        text-align: left; z-index: 3;">
+                        <p>
+                            the dialog system insant that insteating code wise so I will just show how it looks in game and explain it a bit. Basicly we have a single object that manges dialog and writes out character after character, thats how you get the type writer effect.
+                            at the same time as it is doing that it also plays a sound bite, thats how we get the robot voice. There are 2 ways for the game to call a dialog, 1. Hit box, this happens when and where the designers want it.
+                            2. inspection, like what you see in the video.
+                        </p>
+                        <P>
+                            beyond this I have a bunch of unused stuff for this game, about 70% of what I made was cut from this one but you can find that stuff below or <a href="#un" style="text-decoration: none; color: white;"> click here </a> to got to it
+                        </P>
+                    </div>
+
+                      <div>
+                <a href="https://nickzouk.itch.io/nautilus"><img src="images/sin.png" alt="" style="position: absolute; right:  35%; bottom: -110%;"></a>
+                </div>
+            </div>
         </div>
-        
+    
+        <div id="un" class="cont" style="list-style: none;">
+
+        </div>
+
         <div style="height:3000px;">
         </div>
 
