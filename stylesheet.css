@@ -1,0 +1,113 @@
+body{
+    margin: 0;
+    background-color: black;
+}
+
+header{
+    background-color: black;
+    z-index: 10;
+}
+
+ul.headerNav{
+    margin: 0px;
+}
+
+ul.headerNav li{
+    display: inline-block;
+    margin-right: 20px;
+    position: relative;
+    text-align: left;
+    top: 30px;
+}
+
+ul.headerNav li a{
+    text-decoration: none;
+    color: white;
+}
+
+ul.headerNav li a:hover{
+    background-color: rgba(192, 156, 156, 0.1);
+    color: white;
+}
+
+ul.headerNav li a:visited{
+    color: white;
+}
+
+li.logo a{
+    background-image:url("images/cat.png");
+    background-size: 300px;
+    display: inline-block;
+    background-repeat:  no-repeat;
+    height: 80px;
+    width: 80px;
+    text-indent: -99999px;
+    position: relative;
+    top: -30px;
+    right: 20px;
+    margin: 10px;
+    border-radius: 50%;
+}
+
+footer{
+    background-color: black;
+    text-align: center;
+    color: white;
+}
+
+footer a:hover{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+footer a{
+    color: white;
+    text-decoration: none;
+}
+
+footer a:visited{
+    text-decoration: none;
+    color: white;
+}
+
+.sticky{
+    position: sticky;
+    top : 0px;
+}
+
+img.entropy_ball{
+    width: 100%;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+}
+
+img.sub{
+    width: 100%;
+    background-repeat: no-repeat;
+    margin:  0;
+    padding: 0;
+}
+
+.cont{
+    position: relative;
+    color: white;
+    text-align: center;
+}
+
+.Entropy{
+    color: white;
+    position: absolute;
+    left: 30px;
+    bottom: 90%;
+    text-decoration: none;
+}
+
+.Entropy a{
+    color: white;
+    text-decoration: none;
+}
+
+.Entropy a:visited{
+    text-decoration: none;
+    color: white;
+}
