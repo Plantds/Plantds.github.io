@@ -75,7 +75,8 @@ footer a:visited{
 }
 
 img.entropy_ball{
-    width: 100%;
+    width: auto;
+    height: auto;
     background-repeat: no-repeat;
     margin: 0;
     padding: 0;
