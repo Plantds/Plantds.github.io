@@ -1,114 +1,113 @@
-body{
-    margin: 0;
-    background-color: black;
+body.main_page{
+    background: black;
+    overflow: hidden;
 }
 
-header{
-    background-color: black;
-    z-index: 10;
-}
-
-ul.headerNav{
-    margin: 0px;
-}
-
-ul.headerNav li{
-    display: inline-block;
-    margin-right: 20px;
-    position: relative;
-    text-align: left;
-    top: 30px;
-}
-
-ul.headerNav li a{
-    text-decoration: none;
-    color: white;
-}
-
-ul.headerNav li a:hover{
-    background-color: rgba(192, 156, 156, 0.1);
-    color: white;
-}
-
-ul.headerNav li a:visited{
-    color: white;
-}
-
-li.logo a{
-    background-image:url("images/cat.png");
-    background-size: 300px;
-    display: inline-block;
-    background-repeat:  no-repeat;
-    height: 80px;
-    width: 80px;
-    text-indent: -99999px;
-    position: relative;
-    top: -30px;
-    right: 20px;
-    margin: 10px;
-    border-radius: 50%;
-}
-
-footer{
-    background-color: black;
-    text-align: center;
-    color: white;
-}
-
-footer a:hover{
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-footer a{
-    color: white;
-    text-decoration: none;
-}
-
-footer a:visited{
-    text-decoration: none;
-    color: white;
-}
-
-.sticky{
-    position: sticky;
-    top : 0px;
-}
-
-img.entropy_ball{
-    width: auto;
-    height: auto;
-    background-repeat: no-repeat;
-    margin: 0;
-    padding: 0;
-}
-
-img.sub{
+.ascii_container{
+    height: 100%;
     width: 100%;
-    background-repeat: no-repeat;
-    margin:  0;
-    padding: 0;
 }
 
-.cont{
-    position: relative;
+#ascii_canvas{
+    background-color: black; 
+    color: white; 
+    position: absolute; 
+    top:50%; 
+    left:50%; 
+    transform: translate(-50%, -50%); 
+    font-size: 23px;
+}
+
+#main_text{
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid white;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    position:absolute;
+    width: 30%;
+    height: 30%;
+    font-size: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color:white;
+    min-width: fit-content;
+    min-height: fit-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+#main_button{
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid white;
+    top:50%;
+    left:50%;
+    position:absolute;
     color: white;
     text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.Entropy{
+.link:link{
     color: white;
-    position: absolute;
-    left: 30px;
-    bottom: 90%;
+    background-color: transparent;
     text-decoration: none;
 }
 
-.Entropy a{
+.link:visited{
     color: white;
+    background-color: transparent;
     text-decoration: none;
 }
 
-.Entropy a:visited{
-    text-decoration: none;
+.link:hover{
     color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.link:active{
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.pr_Entropy{
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-width: fit-content;
+}
+
+.pr_Nautuls{
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-width: fit-content;
+}
+
+.pr_Terain{
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-width: fit-content;
+}
+
+.pr_PIU{
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-width: fit-content;
+}
+
+.pr_Crimson{
+    background-color: black;
+    color:white;
+    border: 2px solid white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-width: fit-content;
 }
