@@ -1,3 +1,46 @@
+body{
+    background-color: black;
+    overflow: hidden;
+}
+
+.ascii_container{
+    height: 100%;
+    width: 100%;
+}
+
+#ascii_canvas{
+    background-color: black; 
+    color: rgb(53, 53, 53); 
+    position: relative;
+    z-index: -1;
+    font-size: 23px;
+}
+
+#main_text{
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid white;
+    position:relative;
+    width: 30%;
+    height: 30%;
+    font-size: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color:white;
+    min-width: fit-content;
+    min-height: fit-content;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    margin-bottom: 1%;
+}
+
+#main_container{
+    position: absolute;
+    max-width: 30%;
+    min-width: fit-content;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+}
 
 header{
     background-color: black;
@@ -39,71 +82,6 @@ ul.headerNav li a:visited{
     background-color: black;
 }
 
-body.body{
-    background-color: black;
-}
-
-.main_container{
-    width: 100%;
-}
-
-.Title_Text{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-     font-size: 45px;
-}
-
-.Title_Img{
-
-}
-
-.element{
-    background-color: rgba(0, 0, 0, 0.295);
-    color: white;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    max-width: 70%;
-    margin-inline: auto;
-}
-
-.content{
-    max-width: 100%;
-    overflow-wrap: break-word;
-}
-
-.Summary{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.Controbution{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.more_info{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.break{
-    height:300px;
-}
-
-#pr_Entropy{
-}
-
-#pr_Nautuls{
-
-}
-
-#pr_Terain{
-
-}
-
-#pr_PIU{
-
-}
-
-#pr_Crimson{
-
-}
-
 .link:link{
     color: white;
     background-color: transparent;
@@ -126,4 +104,10 @@ body.body{
     color: white;
     background-color: transparent;
     text-decoration: none;
+}
+
+.text{
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid white;
+
 }
