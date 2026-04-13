@@ -1,11 +1,12 @@
 
 header{
     background-color: black;
+    height: 50px;
     z-index: 10;
 }
 
 ul.headerNav{
-    margin: 0px;
+    background-color: black;
 }
 
 ul.headerNav li{
@@ -13,8 +14,9 @@ ul.headerNav li{
     margin-right: 20px;
     position: relative;
     text-align: left;
-    top: 30px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: black;
+    top: 15px;
 }
 
 ul.headerNav li a{
@@ -34,6 +36,7 @@ ul.headerNav li a:visited{
 .sticky{
     position: sticky;
     top : 0px;
+    background-color: black;
 }
 
 body.body{
