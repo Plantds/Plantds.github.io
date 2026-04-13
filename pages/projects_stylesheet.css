@@ -1,4 +1,41 @@
 
+header{
+    background-color: black;
+    z-index: 10;
+}
+
+ul.headerNav{
+    margin: 0px;
+}
+
+ul.headerNav li{
+    display: inline-block;
+    margin-right: 20px;
+    position: relative;
+    text-align: left;
+    top: 30px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+ul.headerNav li a{
+    text-decoration: none;
+    color: white;
+}
+
+ul.headerNav li a:hover{
+    background-color: rgba(192, 156, 156, 0.1);
+    color: white;
+}
+
+ul.headerNav li a:visited{
+    color: white;
+}
+
+.sticky{
+    position: sticky;
+    top : 0px;
+}
+
 body.body{
     background-color: black;
 }
