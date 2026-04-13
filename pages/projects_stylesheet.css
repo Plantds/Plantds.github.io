@@ -1,0 +1,85 @@
+
+body.body{
+    background-color: black;
+}
+
+.main_container{
+    width: 100%;
+}
+
+.Title_Text{
+     font-family: Verdana, Geneva, Tahoma, sans-serif;
+     font-size: 45px;
+}
+
+.Title_Img{
+
+}
+
+.element{
+    background-color: rgba(0, 0, 0, 0.295);
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    max-width: 70%;
+    margin-inline: auto;
+}
+
+.content{
+    max-width: 100%;
+    overflow-wrap: break-word;
+}
+
+.Summary{
+     font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.Controbution{
+     font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.more_info{
+     font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#pr_Entropy{
+}
+
+#pr_Nautuls{
+
+}
+
+#pr_Terain{
+
+}
+
+#pr_PIU{
+
+}
+
+#pr_Crimson{
+
+}
+
+.link:link{
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.link:visited{
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.link:hover{
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.link:active{
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+}
