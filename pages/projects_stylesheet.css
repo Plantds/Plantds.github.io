@@ -1,8 +1,9 @@
 
 header{
     background-color: black;
-    height: 50px;
+    height: 55px;
     z-index: 10;
+    font-size: 20px;
 }
 
 ul.headerNav{
@@ -11,12 +12,13 @@ ul.headerNav{
 
 ul.headerNav li{
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 40px;
     position: relative;
     text-align: left;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: black;
     top: 15px;
+    padding: 10px;
 }
 
 ul.headerNav li a{
@@ -25,8 +27,7 @@ ul.headerNav li a{
 }
 
 ul.headerNav li a:hover{
-    background-color: rgba(192, 156, 156, 0.1);
-    color: white;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 ul.headerNav li a:visited{
@@ -43,6 +44,128 @@ body.body{
     background-color: black;
 }
 
+.Card{
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+    width: 100%;
+    height: fit-content;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.TopOfCard{
+    display: inline-block;
+    display: flex;
+    margin: 0px 30px 0px 30px;
+    height: fit-content;
+    min-width: fit-content;
+    border: 2px solid rgb(158, 158, 158);;
+    background-color: black;
+    max-width: 95%;
+} 
+
+.TopOfCardImg{
+    align-self: center;
+    width: 100%;
+    height: 100%;
+    border: 2px solid white;
+    margin: 20px;
+    background-color: black;
+}
+
+.TopOfCardText{
+}
+
+.SummaryContainer{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+    .SummaryBox{
+        flex:100%;
+    }
+}
+
+.SummaryBox{
+    display: inline-block;
+    display: flex;
+    border: 2px solid rgb(92, 92, 92);
+    margin: 10px;
+    height: 75px;
+    width: fit-content;
+    align-items: center;
+    background-color: black;
+}
+
+.SummaryIcons{
+    height: 45px;
+    width: auto;
+    margin: 10px;
+}
+
+.SummaryText{
+    margin: 10px;
+    font-size: 20px;
+}
+
+.BottomOfCard{
+    margin: 30px;
+    height: fit-content;
+}
+
+.GameSummary{
+    border: 2px solid rgb(158, 158, 158);;
+    display: flow-root;
+    flex-wrap: wrap;
+    margin: 20px 0px 20px 0px;
+    padding: 10px;
+    background-color: black;
+}
+
+.breakdown{
+    display: flex;
+    justify-content: center;
+    border: 2px solid rgb(158, 158, 158);
+    background-color: black;
+}
+
+.breakdown p{
+    font-size: 25px 
+}
+
+.awards_container{
+    height: 10;
+    width: auto;
+    display: flex;
+    margin: 30px;
+    padding: 30px;
+    justify-content: center;
+    border: 2px solid rgb(158, 158, 158);
+    background-color: black;
+}
+
+.awards{
+    width: auto;
+    height:15vw;
+    align-self: center;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.gs_smalltext{
+    font-size: 18px;
+}
+
+.gs_vid{
+    width:  auto;
+    height: 300px;
+    float:left; 
+    margin: 20px 20px 20px 20px;
+    border: 2px solid rgb(92, 92, 92);
+}
+
 .main_container{
     width: 100%;
 }
@@ -50,10 +173,6 @@ body.body{
 .Title_Text{
      font-family: Verdana, Geneva, Tahoma, sans-serif;
      font-size: 45px;
-}
-
-.Title_Img{
-
 }
 
 .element{
@@ -64,66 +183,27 @@ body.body{
     margin-inline: auto;
 }
 
-.content{
-    max-width: 100%;
-    overflow-wrap: break-word;
-}
-
-.Summary{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.Controbution{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-.more_info{
-     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
 .break{
-    height:300px;
-}
-
-#pr_Entropy{
-}
-
-#pr_Nautuls{
-
-}
-
-#pr_Terain{
-
-}
-
-#pr_PIU{
-
-}
-
-#pr_Crimson{
-
+    height: 10px;
 }
 
 .link:link{
     color: white;
     background-color: transparent;
-    text-decoration: none;
+    font-size: 17px;
 }
 
 .link:visited{
     color: white;
     background-color: transparent;
-    text-decoration: none;
 }
 
 .link:hover{
     color: white;
     background-color: transparent;
-    text-decoration: none;
 }
 
 .link:active{
     color: white;
     background-color: transparent;
-    text-decoration: none;
 }

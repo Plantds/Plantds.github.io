@@ -48,6 +48,7 @@ header{
     background-color: black;
     height: 50px;
     z-index: 10;
+    font-size: 20px;
 }
 
 ul.headerNav{

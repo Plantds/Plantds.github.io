@@ -19,35 +19,25 @@ body{
 }
 
 #main_text{
+    top: 50%;
+    left: 50%;
+    transform:translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.95);
     border: 2px solid white;
-    position:relative;
-    width: 30%;
-    height: 30%;
+    position:absolute;
     font-size: 10px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color:white;
-    min-width: fit-content;
-    min-height: fit-content;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
+    overflow-wrap: break-word;
     margin-bottom: 1%;
-}
-
-#main_container{
-    position: absolute;
-    max-width: 30%;
-    min-width: fit-content;
-    top:50%;
-    left:50%;
-    transform: translate(-50%, -50%);
+    max-width: 90%;
 }
 
 header{
     background-color: black;
     height: 50px;
     z-index: 10;
+    font-size: 20px;
 }
 
 ul.headerNav{
