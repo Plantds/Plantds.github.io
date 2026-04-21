@@ -78,3 +78,36 @@ body.main_page{
     background-color: transparent;
     text-decoration: none;
 }
+
+.contactContainer{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    .contact{
+        flex:100%;
+    }
+}
+
+.contact{
+    display: inline-block;
+    display: flex;
+    margin: 10px;
+    height: 75px;
+    width: fit-content;
+    align-items: center;
+    background-color: black;
+}
+
+.contactIcons{
+    height: 45px;
+    width: auto;
+    margin: 0px 10px 0px 10px; 
+}
+
+.contactText{
+    margin: 10px;
+    font-size: 20px;
+}

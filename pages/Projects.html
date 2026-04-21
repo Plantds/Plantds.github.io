@@ -15,11 +15,15 @@
             </ul>
         </header>
 
+         <div id="ascii_container">
+            <pre id="ascii_canvas"></pre>
+        </div>
+
         <div class="main_container">
 
             <div class="element">
 
-                <div class="Card">
+                <div class="Card" id="Entropy">
                     <div style="display: flex; justify-content: center; height: auto; width: 120%; z-index: 3; transform: translate(-8%);">
                         <img src="Entropy/EImages/Logo_entropy.png" alt="" class="TopOfCardImg">
                     </div>
@@ -109,7 +113,7 @@
                     <div class="BottomOfCard">
                         <div class="GameSummary">
                             <video class="gs_vid" controls src="Entropy/EVids/Entropy Trailer.mp4"></video>
-                            <p style="font-size: 25px;"> <b> Game_Summmary </b> </p>
+                            <p style="font-size: 25px;"> <b> Game Summmary </b> </p>
                             <p class="gs_smalltext">
                                 Entropy is a puzzle platformer with light horror elements where you explore a ruin of a long forgotten civilization. <br>
                                 <br>
@@ -138,7 +142,7 @@
 
                         <div class="GameSummary">
                             <video class="gs_vid" controls src="Entropy/EVids/oldGrowth.mp4"></video>
-                            <p style="font-size: 25px;"> <b> Vine_Genertor </b> (Unfinnished/Unimplemented) </p>
+                            <p style="font-size: 25px;"> <b> Vine Genertor </b> (Unfinnished/Unimplemented) </p>
                             <p class="gs_smalltext">
                                 <b> Finding point </b> finding where the points should go is easy, I just send a bunch of rays in a cone in a diraction. Anywhere where these nodes hit is where we can make a new spline point for the vine. <br>
                                 <br>
@@ -165,7 +169,7 @@
 
                 </div>
 
-                <div class="Card">
+                <div class="Card" id="MIU">
                     <div style="display: flex; justify-content: center; height: auto; width: 120%; z-index: 3; transform: translate(-8%);">
                         <img src="MIU/MIU_Imges/UnityLogo.png" alt="" class="TopOfCardImg">
                     </div>
@@ -229,7 +233,7 @@
                         
                     <div class="BottomOfCard">
                         <div class="GameSummary">
-                            <p style="font-size: 25px;"> <b> Project_Summmary </b> </p>
+                            <p style="font-size: 25px;"> <b> Project Summmary </b> </p>
                             <p class="gs_smalltext">
                                This is a <b> personal project </b> I did in school at <a href="https://www.playgroundsquad.com/" class="link"> <b> PSQ </b> </a>. I enjoy physic based movement, I think its really cool so making movement in untiy was an easy choice for this personal project.<br>
                                <br>
@@ -282,7 +286,7 @@
 
                 </div>
 
-                <div class="Card">
+                <div class="Card" id="Nat">
                     <div style="display: flex; justify-content: center; height: auto; width: 120%; z-index: 3; transform: translate(-8%);">
                         <img src="Nautuls/Naut_imgs/natLogo.png" alt="" class="TopOfCardImg">
                     </div>
@@ -363,7 +367,7 @@
                     <div class="BottomOfCard">
                         <div class="GameSummary">
                             <video class="gs_vid" controls src="Nautuls/Naut_vids/NautilusTrailer.mp4"></video>
-                            <p style="font-size: 25px;"> <b> Game_Summmary </b> </p>
+                            <p style="font-size: 25px;"> <b> Game Summmary </b> </p>
                             <p class="gs_smalltext">
                                 Pilot a sumbarine and venture into the deep unkown of the far deeper sea. Discouver an long frogotten ruin of a people long gone. <br> <br>
                                 Pianer the sub througth dangreus terrain to find any information about the people who used to live here but do not threat you are not alone with your trusty Ai pilot onborad. <br>
@@ -429,7 +433,7 @@
 
                 </div>
 
-                <div class="Card">
+                <div class="Card" id="Terrain">
                     <div style="display: flex; justify-content: center; height: auto; width: 120%; z-index: 3; transform: translate(-8%);">
                         <img src="Terrain/Terrain Img/terrainLogo.png" alt="" class="TopOfCardImg">
                     </div>
@@ -494,7 +498,7 @@
                     <div class="BottomOfCard">
                         <div class="GameSummary">
                             <img class="gs_vid" src="Terrain/Terrain Img/Brownian_tree.gif" alt="diffusion limited aggregation">
-                            <p style="font-size: 25px;"> <b> Project_Summmary </b> </p>
+                            <p style="font-size: 25px;"> <b> Project Summmary </b> </p>
                             <p class="gs_smalltext">
                                 This is another personal project we were given time for in school and I really like maountains so I decided to make this. Mountain terrain generator using Diffusion Limited Aggregation or DLA. <br> <br>
                                 I learnt about this from <a href="https://youtu.be/gsJHzBTPG0Y?t=579" class="link"> <b> this </b> </a> video and it was really intressting so I wanted to try it.
@@ -671,7 +675,7 @@
             </div>
         </div>
 
-        <footer style="border: 2px solid white; color: white; width: 100%; height: fit-content; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        <footer class="footer">
             <div style="width: 30%; height: 100%; padding: 20px; display: inline-block;">
                 <b>
                     <a href="contacts.html" class="link"> <p> Contacts: </p> </a>
@@ -685,6 +689,6 @@
                <a href="#top" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
             </div>
         </footer>
-
     </body>
+    <script src="/scripts/do_to_ascii.js"></script>
 </html>

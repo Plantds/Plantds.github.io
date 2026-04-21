@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" href="devlog_stylesheet.css">
     </head>
-    <body class="main_page">
+    <body class="body" id="top">
         <header class="mainmenu sticky">
             <ul class="headerNav">
                 <li><a href="/index.html">Home</a></li>
@@ -16,13 +16,53 @@
 
         <div id="ascii_container">
             <pre id="ascii_canvas"></pre>
+        </div>
 
-            <div id="main_container">
-                <div id="main_text">
-                    
+        <div class="main_container">
+            <div class="element">
+
+                <div class="year">
+                    Year: 2026
                 </div>
+                
+                <div class="Card">
+                    <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                        <div class="month">
+                            Month: April
+                        </div>
+                    </div>
+                    <div class="CardInfoContainer">
+                        
+                        <div class="Log">
+                            <div class="day">
+                                Day: 21
+                            </div>
+                            <div class="LogText">
+                                Worked on my website, the one you are currently looking at
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                
             </div>
         </div>
+
+        <footer class="footer">
+            <div style="width: 30%; height: 100%; padding: 20px; display: inline-block;">
+                <b>
+                    <a href="contacts.html" class="link"> <p> Contacts: </p> </a>
+                    <a href="mailto:tomaswallin8@gmail.com" class="link"> <p> Email: tomaswallin8@gmail.com </p> </a>
+                    <a href="tel:+46761736873" class="link"> <p> Phone: +46 76 173 68 73 </p> </a>
+                    <a href="https://github.com/Plantds" class="link"> <p> Github: Plantds </p> </a>
+                    <a href="https://www.linkedin.com/in/tomas-wallin-192392387/" class="link"> <p> Linkedin: Tomas Wallin</p> </a>
+                </b>
+                </div>
+            <div style="padding: 20px; display: inline-block; height: 100%;">
+               <a href="#top" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
+            </div>
+        </footer>
     </body>
     <script src="/scripts/do_to_ascii.js"></script>
 </html>
