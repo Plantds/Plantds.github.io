@@ -81,6 +81,11 @@ body.body{
 .TopOfCardText{
 }
 
+.vidCenterContainer{
+    display: flex; 
+    justify-content: center;
+}
+
 .SummaryContainer{
     display: flex;
     flex-wrap: wrap;
