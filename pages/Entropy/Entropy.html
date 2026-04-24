@@ -3,8 +3,383 @@
     <head>
         <link rel="stylesheet" href="entropy_stylesheet.css">
     </head>
-    <body class="main_page">
+    <body class="body" id="top">
+        <header class="mainmenu sticky">
+            <ul class="headerNav">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/pages/Projects.html">Projects</a></li>
+                <li><a href="/pages/dev_log.html">Dev log</a></li>
+                <li><a href="/pages/contacts.html">Contact</a></li>
+                <li><a href="/pages/About_Me.html">About me</a></li>
+            </ul>
+        </header>
 
+        <div id="ascii_container">
+            <pre id="ascii_canvas"></pre>
+        </div>
+
+        <div class="main_container">
+            <div class="element">
+
+                <div class="Title">
+                    Platforms
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                Moving Platforms before Entropy
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+
+                                The platforms had an intressting dev time line. See they were made orignally in a proprietary game engine from PSQ. Back when Entropy was a 2 week "get used to this engine" project.<br>
+                                This engine was bare bones and I can not show any code from it becouse NDA but I will still explain everything I can that was within it while not violation said NDA. <br>
+                                The engine had no splines but had <b style="color:rgb(255, 233, 0);">*</b>nodes<b style="color:rgb(255, 233, 0);">*</b>, <b style="color:rgb(255, 233, 0);">*</b>tags<b style="color:rgb(255, 233, 0);">*</b> and <b style="color:rgb(255, 233, 0);">*</b>dispaly names<b style="color:rgb(255, 233, 0);">*</b>. <br>
+                                So with the help of <a style="color: rgb(219, 112, 219);" href="https://fil3sav3d.github.io/" class="link"> <b>Kjell Hopkins</b></a> we ended up figuring out the platfrom sytem. <br>
+                                This was also where we relized the mathmatical problem with lerping over a distance using the same speed, also know as the mathimatical problem. <br> <br> <!-- Remove br once box problem is done -->
+
+                                <!--
+                                    <div class="ascii_show">
+                                        <div id="BoxProblem">
+                                            <div id="little-box"></div>
+                                        </div>
+                                        <div class="inputSettings">
+                                            <input type="range" name="time" min="0" max="1000" id="boxRange">
+                                            <label for="time" style="font-family: Verdana, Geneva, Tahoma, sans-serif;"> Time </label>
+                                        </div>
+                                    </div>
+                                -->
+
+                                <b> The Mathimatical problem </b><br>
+                                Say we have 2 boxes <b style="color:rgb(255, 115, 0)">[A]</b> and <b style="color:rgb(137, 164, 240);">[B]</b>, they are both lerping over a distance. Box <b style="color:rgb(255, 115, 0)">[A]</b> has the distance of 10m while box <b style="color:rgb(137, 164, 240);">[B]</b> has a distance of 20m. <br>
+                                Lerping from start to end on both boxes with the same speed will have this effect: when lerp is 0.5 (50%) done <b style="color:rgb(137, 164, 240);">[B]</b> will be 10m and <b style="color:rgb(255, 115, 0)">[A]</b> will be ... 5m.<br>
+                                Even thougth they are lerping at the same speed they are travling a differnt distance 50% of 20m is 10m and 50% of 10m is 5m.<br>
+                                So we needed to fix this cus otherwise diffrent platfroms would have differnt speed which wouldnt feel great.<br>
+                                How did we do this? Well <b style="color:rgb(255, 233, 0);">*</b>math<b style="color:rgb(255, 233, 0);">*</b>  of course. <br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+		                                platform.<b style="color:rgb(74, 207, 185)">m_time</b> = std::clamp(platform.<b style="color:rgb(74, 207, 185)">m_time</b> += (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                    </code>
+                                </div>
+                                This line of code here is what is handling time for the platfroms. Let me break it down for you.<br>
+                                "<b style="color:rgb(74, 207, 185); font-family: monospace;" >m_time</b>" is the current time of this platform.<br>
+                                "<b style="color: rgb(156, 123, 182); font-family: monospace;">time_flow</b>" is either 1, -1 depending on if the platform is "active", active means that the player has told it to start moving.<br>
+                                 1 means for it to go forward in the lerp, start -> end. -1 means going backwards in the lerp, end -> start.<br>
+                                "<b style="color: rgb(175, 63, 119); font-family: monospace;">m_point_travel_time</b>" is the time it takes for the platform to travel, in effet is speed <br>
+                                "<b style="color: rgb(114, 182, 94); font-family: monospace;">diff</b>" is just the length difference between the points its traveling between <br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>)
+                                    </code>
+                                </div>
+                                This looks werid but we do this becouse the engine we worked in doesnt clamp <b style="color:rgb(214, 128, 97)">_delta_time</b> by defult so tabing in and out would get you a ridiculous number, so we compensate for it by clamping the <b style="color:rgb(214, 128, 97)">_delta_time</b> value. <br>
+                                Then we multiply this by both the speed and the time flow of the platfrom. This gets us out a time value that compensates for diraction of travel and framerate.
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        std::clamp( platform.m_time += (*Previus Code*) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                    </code>
+                                </div>
+                                After we done the time value but before we add it to our previus time we divide this value by the <b style="color: rgb(114, 182, 94); font-family: monospace;">diff</b> to acount for the space between the points.<br>
+                                We add all of this onto the time, incrmently increasting it towards 1 or 0 deppending on <b style="color: rgb(156, 123, 182); font-family: monospace;">time_flow</b>.<br>
+                                Lastly we clamp the value to make sure that we do not go above 1 or bellow 0.<br><br>
+
+                                This is how we get a time for the lerp that will be moving at the same speed nomatter the distance it has to travel.
+
+                                <!-- add another box problem here but with the soultion -->
+                                 <br>
+                                 <br>
+                                 <b> The Feature Problem </b> <br>
+                                 As I said before the engine we used for this didnt have splines but we manged to come up with a creative soultion.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        auto searchForPlatformsPoints = [](const std::shared_ptr<iNode> _node) {<br>
+	                                    	if (_node->hasTag("<b style="color: rgb(177, 77, 77);">is_point</b>"))<br>
+	                                    	{<br>
+	                                    		_node->setHidden(true);<br>
+	                                    		return true;<br>
+	                                    	}<br>
+	                                    	return false;<br>
+	                                    	};<br><br>
+                                            
+	                                    auto points = _scene.lock()->searchAllNodes(searchForPlatformsPoints);<br>
+                                    </code>
+                                </div>
+                                First we search all the nodes in the scene if they have the tag "<b style="color: rgb(177, 77, 77);">is_point</b>". If the node has his tag we set it to hidden and add it to an array of points. <br>
+                                We sort this array using the points name, the points are named from 0 -> X, X being how every many points there were. <br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        for (auto& point : points) <br>
+	                                        {<br>
+	                                        	if (point->hasTag(getName()))<br>
+	                                        	{<br>
+	                                        		auto pos = point->getWorldPosition();<br>
+	                                        		<b style="color: hotpink;">positions</b>.push_back(pos);<br>
+	                                        	}<br>
+	                                        }
+                                    </code>
+                                </div>
+                                Lasty we get all the points that have a tag that is the same as this platfroms name. Stroing their world positions in <b style="color: hotpink;">positions</b>, the platfrom will then use this vector of <b style="color: hotpink;">positions</b> to figure out where to travel to. <br> <br>
+                                This was how we got around the lack of splines.<br>
+                                <br>
+                                I cant give acces to the full project but I was allowed to share these filles, edited to not hit NDA but still
+                                <div style="display: flex; margin-top: 0px;">
+                                    <div style="width: 100%; height: fit-content; display: flex; justify-content: center; margin-top: 50px;">
+                                        <a class="link" href="DownloadableFiles/cPlatforms.cpp" download>
+                                            <div class="MinorTitle">
+                                                Download Platfrom.cpp
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div style="width: 100%; height: fit-content; display: flex; justify-content: center; margin-top: 50px;">
+                                        <a class="link" href="DownloadableFiles/cPlatforms.h" download>
+                                            <div class="MinorTitle">
+                                                Download Platfrom.h
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center; margin-top: 50px;">
+                            <div class="MinorTitle">
+                                Moving Platforms In Entropy
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video src="EVids/moving.mp4" style="width: 100%; height: 100%;" controls>
+                                    </div>
+                                </div>
+
+                                In Entropy proper I used a spline insdead of this complicate system of tags and names. <br>
+                                Lets start with going over what remains from the old system so we can then see how much this grew when I had 9 weeks to work on it. <br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/Lerp.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                This looks very simular to before becouse it is the same formula. We mutliply <b style="color:rgb(214, 128, 97)">delta sec</b>, <b style="color: rgb(156, 123, 182); font-family: monospace;">time flow</b> and
+                                <b style="color: rgb(175, 63, 119); font-family: monospace;">Platfrom Speed</b> then take that divide it with the <b style="color: rgb(114, 182, 94); font-family: monospace;">diff</b>
+                                add it to the lerp value, clamp it to make sure that it doesnt grow above or bellow what we want and set the lerp value to be equal to all of this.<br> <br>
+                                Now for something new that I added to the platform.
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video src="EVids/rumbel.mp4" style="width: 100%; height: 100%;" controls>
+                                    </div>
+                                </div>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/Rummble.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                Crossed and rumbel is a function and a macro that I made to shake the platfrom between 2 points on the spline. <br>
+                                <!-- VIDEO HERE -->
+                                 It looks like this in game but heres how it looks in the code starting with "Crossed A Point". 
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/r1.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                This looks like a lot and it is so let me break it down a bit<br>
+                                Both the top path and the bottom path do the same thing just in different <b style="color: rgb(156, 123, 182); font-family: monospace;">time flow</b> directions.
+                                If this platfrom has corssed this point in world return true. <br>
+                                After this we used the <b style="color: rgb(156, 123, 182); font-family: monospace;">time flow</b> to pick either <b style="color: rgb(47, 255, 141); font-family: monospace;"> next point </b> or <b style="color: rgb(47, 255, 141); font-family: monospace;"> prev point</b>. <br>
+                                 <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/r2.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                Then we just update the <b style="color: rgb(47, 255, 141); font-family: monospace;"> next point </b> and <b style="color: rgb(47, 255, 141); font-family: monospace;"> prev point </b> sending all of this out in the output node. Which links into rumble start.
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/rstart.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                We use the <b style="color: rgb(47, 255, 141); font-family: monospace;"> next point </b> and <b style="color: rgb(47, 255, 141); font-family: monospace;"> prev point </b> as keys in this map to find the rumbel settings
+                                From the rummble settings we get out the speed we want the rumble to be at, this alows us to speed up the platorm or slow it down while the rumble is happening. While this is happening we flip a bool true. Lastly we altranate between strength in the postive and strength in the negative. <br>
+                                This gives us the shaking effect. We push out strength and the bool and it goes into RotSecltion.
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/rotS1.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                This function is what handels the platfroms positon and rotation on the spline path so the name is a bit of a misnomer.<br>
+                                For the rumbel effect we care about 4 veriables <b style="color: rgb(106, 255, 47); font-family: monospace;"> target distnace on spline </b> or <b style="color: rgb(106, 255, 47); font-family: monospace;"> TDOS</b>, <b style="color: rgb(255, 206, 47); font-family: monospace;"> Flip flop float</b>, <b style="color: rgb(255, 47, 47); font-family: monospace;"> Flip flop (bool)</b> and <b style="color: rgb(255, 47, 245); font-family: monospace;"> Happenign</b> missed spelt happening.<br>
+                                We use the <b style="color: rgb(106, 255, 47); font-family: monospace;"> TDOS</b> value to get the transfrom at that point in the spline, spliting it and only saving the position and rotation for later. <br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/rotS2.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                After we have gotten the rotation we pick the rotation we want to use, in the game proper we end up using the platfroms rotation almost always but there is funcinality for the use of the splins rotation.<br>
+                                Side note; Spline rotation works on a 180° half circle slice. So if the spline turns in a C pattern then in the middle of that C pattern it would snap fliping in 180° in an instant.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/rotS3.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                Now we are finnaly back to the rumbel part of this. The branch, which is just an if, takes in both <b style="color: rgb(255, 47, 47); font-family: monospace;"> Flip flop (bool)</b> and <b style="color: rgb(255, 47, 245); font-family: monospace;"> Happenign</b> and if both are true we use the rumbel. <br>
+                                We look between the points we currently are to get the rumbel struct. We take out the enum which repricents the 3 diractions and depending on if we rumbel on the x, y or z we take that postion and add <b style="color: rgb(255, 206, 47); font-family: monospace;"> Flip flop float</b> to it. This gets us the shaking motion that we want.<br>
+                                Of course this targets a visual only part of the platform and not the thing you are acutally standing on as to not shake the player as well.<br>
+                                We apply all of this, rotation and postion, to the platfrom to get it to actually move and rotate along the spline. <br><br>
+                                Now then let me show you how we call this platform to start moving.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/startandreverse.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                This is how we handel calling the platform to start moving. We flip a bool called "<b style="color: rgb(235, 107, 107); font-family: monospace;">is Available</b>" this bool lets the projectiles know if they can or can not grab this platfrom.<br>
+                                We set <b style="color: rgb(156, 123, 182); font-family: monospace;">time flow</b> and flip another bool to say we are delaying the platform then we delay it. We do this so get the platfrom to stand still for a secound when activated or deactivated. <br>
+                                After the delay set the time flow so it can start moving again. The "<b style="color: rgb(233, 74, 0); font-family: monospace;">Switched</b>" bool controls swtiching the start and end of the platfrom.
+                                So if it active then the time flow has to be in reverse. <br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/rumeblcall.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                There is also this part of the code where you can see the delay come back into play. This is where we get the same shake effect but when we first start moving or change directions.<br>
+                                <br>
+                                Now onto debug, well my custom debug tool-thingy.<br>
+                                The debug tool is devided into 4 sections, Creating start cube, creating mid cubes, creating end cubes and destroying cubes.<br>
+                                Lets begin with the start and end cube as they are basically the same 
+                                
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video src="EVids/2026-04-23 18-21-57.mp4" style="width: 100%; height: 100%;" controls>
+                                    </div>
+                                </div>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/StartCube.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                First we spawn the actor into the world, all debug actor have their own debug material. <br>
+                                We then attach this actor onto the platfrom, after that we set its postion and rotation using the Rot Selection function.<br>
+                                Then we change out the staic mesh to be the platfroms mesh and add it to an array of debug actors <br>
+                                This line should be memerabel we tag the the debug actor with the display name of the platform, simular to how old entropy did it <br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/midcubes.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                mid cubes are simular to end and star the only real difference is that they are in a for loop and they use input key to find their positon and rotation.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/destroycubes.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                Destroy cubes just goes througth 2 loops to make sure that the actors are destroyed.<br>
+                                This is kinda it for the moving platfroms.
+                            </div>
+                        </div>
+
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center; margin-top: 50px;">
+                            <div class="MinorTitle">
+                                Freezing Platforms In Entropy
+                            </div>
+                        </div>
+
+                        <div class="TextBox">
+                            <div class="Text">
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video src="EVids/freeze.mp4" style="width: 100%; height: 100%;" controls>
+                                    </div>
+                                </div>
+
+                                Freezing doesnt have that much that is different from the moving platfrom. It is just move intill the player interacts with it. Thats why is called freezing platfrom. <br>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                This is how we create this looping motion on the lerp. If the spline is an open spline then we just pasuse it for a secound then send it back but if its a closed loop.
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/freeze2.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                then we do this, basically what this does is just rest the lerp back to how it would be at start. Creating the loop effect.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="Title">
+                    Vine Generator
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                             <div class="TextBox">
+                            <div class="Text">
+                                This was my attempt to make a vine generator for fun basically. We ran low on work so when I was bored and had some free time I would just work on this. 
+                                All the programmers did this and thats how we got the <a href="EImages/bug2.png" download class="link" style="color: rgb(143, 201, 181);"><b style="color: rgb(143, 201, 181);">*bugs*</b> </a> you can see in entropy into the game.<br>
+                                So good thing came out of it in the end.<br>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="Title">
+                    Improved Platforms 
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                             <div class="TextBox">
+                                <div class="Text">
+                                    <div class="imagecontrainer">
+                                        <div class="Imgae" style="max-width: 1000px;">
+                                            <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div style="width: 30%; height: 100%; padding: 20px; display: inline-block;">
+                <b>
+                    <a href="contacts.html" class="link"> <p> Contacts: </p> </a>
+                    <a href="mailto:tomaswallin8@gmail.com" class="link"> <p> Email: tomaswallin8@gmail.com </p> </a>
+                    <a href="tel:+46761736873" class="link"> <p> Phone: +46 76 173 68 73 </p> </a>
+                    <a href="https://github.com/Plantds" class="link"> <p> Github: Plantds </p> </a>
+                    <a href="https://www.linkedin.com/in/tomas-wallin-192392387/" class="link"> <p> Linkedin: Tomas Wallin</p> </a>
+                </b>
+                </div>
+            <div style="padding: 20px; display: inline-block; height: 100%;">
+               <a href="#top" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
+            </div>
+        </footer>
     </body>
-
+    <script src="/scripts/do_to_ascii.js"></script>
+    <script src="/scripts/Box_ascii.js"></script>
 </html>

@@ -168,11 +168,6 @@ body.body{
 }
 
 .footer{
-    /* Remove once devlog grows */
-    bottom: 0px;
-    position: fixed;
-    /* Remove once devlog grows */
-
     border-top: 2px solid white; 
     color: white; 
     width: 100%; 

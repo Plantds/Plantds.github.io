@@ -1,4 +1,248 @@
-body.main_page{
-    background: black;
-    overflow: hidden;
+
+header{
+    height: fit-content;
+    z-index: 10;
+    font-size: 20px;
+}
+
+ul.headerNav{
+    background-color: rgb(0, 0, 0);
+    height: fit-content;
+    width: 99%;
+    padding: 5px;
+}
+
+ul.headerNav li{
+    display: inline-block;
+    margin-right: 10px;
+    margin-left: 10px;
+    position: relative;
+    text-align: left;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: black;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    margin-left: 20px;
+}
+
+ul.headerNav li a{
+    text-decoration: none;
+    color: white;
+}
+
+ul.headerNav li a:hover{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+ul.headerNav li a:visited{
+    color: white;
+}
+
+.sticky{
+    position: sticky;
+    top : 0px;
+    background-color: black;
+}
+
+.ascii_container{
+    height: 100%;
+    width: 100%;
+}
+
+#ascii_canvas{
+    background-color: black; 
+    color: rgb(53, 53, 53); 
+    position: fixed; 
+    top:50%; 
+    left:50%; 
+    transform: translate(-50%, -50%); 
+    font-size: 23px;
+    z-index: -1;
+}
+
+.ascii_show{
+    border: 2px solid rgb(87, 87, 87);
+    width: 98%;
+    height: 500px;
+    margin: 10px;
+}
+
+.inputSettings{
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-gap: 5px;
+    justify-content: center;
+}
+
+body.body{
+    background-color: black;
+}
+
+#BoxProblem{
+    border-bottom: 2px solid rgb(87, 87, 87);
+    height: 93%;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}
+
+#little-box
+{
+  background-color: rgb(255, 255, 255);
+  width: 10px;
+  height: 10px;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+}
+
+.Imgae{
+    border: 2px solid rgb(65, 65, 65);
+    max-width: 100%;
+    height: auto;
+}
+
+.imagecontrainer{
+    height: fit-content; 
+    justify-content: center; 
+    display: flex; 
+    margin: 20px;
+    max-width: 100%;
+}
+
+.Card{
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 2px solid white;
+    width: 100%;
+    height: fit-content;
+    margin-top: 25px;
+    margin-bottom: 50px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.CardInfoContainer{
+    margin: 10px;
+    height: fit-content;
+}
+
+.TextBox{
+    border: 2px solid rgb(158, 158, 158);
+    flex-wrap: wrap;
+    padding: 10px;
+    background-color: black;
+    margin: 10px;
+}
+
+.MinorTitle{
+    border: 2px solid rgb(204, 204, 204);
+    width: fit-content;
+    height: fit-content;
+    padding: 12px;
+    margin: 10px;
+    font-size: 25px;
+    background-color: black;
+    text-align: center;
+}
+
+.TextImg{
+    width: 100%;
+    height: 100%;
+}
+
+.Title{
+    display: flex;
+    justify-content: center;
+    border: 2px solid white;
+    height: fit-content;
+    padding: 20px;
+    font-size: 35px;
+    background-color: black;
+    margin-top: 175px;
+}
+
+.day{
+    border: 2px solid rgb(95, 95, 95);
+    width: fit-content;
+    height: fit-content;
+    padding: 10px;
+    margin: 10px;
+}
+
+.Text{
+    font-size: 18px;
+    margin: 10px;
+}
+
+.gs_vid{
+    width:  auto;
+    height: 300px;
+    margin: 20px 20px 20px 20px;
+    border: 2px solid rgb(92, 92, 92);
+    justify-self: center;
+}
+
+.main_container{
+    width: 100%;
+}
+
+.Title_Text{
+     font-family: Verdana, Geneva, Tahoma, sans-serif;
+     font-size: 45px;
+}
+
+.element{
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    max-width: 70%;
+    margin-inline: auto;
+}
+
+.codeCase{
+    border: 2px solid rgb(151, 151, 151);
+    margin: 10px;
+    padding: 10px;
+    background-color: rgb(54, 54, 54);
+}
+
+.CPPCode{
+    font-family: monospace;
+}
+
+.break{
+    height: 10px;
+}
+
+.link:link{
+    color: white;
+    background-color: transparent;
+    font-size: 17px;
+}
+
+.link:visited{
+    color: white;
+    background-color: transparent;
+}
+
+.link:hover{
+    color: white;
+    background-color: transparent;
+}
+
+.link:active{
+    color: white;
+    background-color: transparent;
+}
+
+.footer{
+    border-top: 2px solid white; 
+    color: white; 
+    width: 100%; 
+    height: fit-content; 
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px; 
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: black;
 }
