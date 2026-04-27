@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <link rel="stylesheet" href="MIU_Style.css">
+    </head>
+    <body class="body" id="top">
+        <header class="mainmenu sticky">
+            <ul class="headerNav">
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/pages/Projects.html">Projects</a></li>
+                <li><a href="/pages/dev_log.html">Dev log</a></li>
+                <li><a href="/pages/contacts.html">Contact</a></li>
+                <li><a href="/pages/About_Me.html">About me</a></li>
+            </ul>
+        </header>
+
+        <div id="ascii_container">
+            <pre id="ascii_canvas"></pre>
+        </div>
+
+        <div class="main_container">
+            <div class="element">
+
+                <div class="Title">
+                    Player
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                         <div class="TextBox">
+                            <div class="Text">
+                                So for the Movement in unity or MIU im going to go script by script function by function and you can see which script im talking about by the tittle that comes up.
+                                <br>
+                                like here it is "Player.cs"
+                            </div>
+                        </div>
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                Player.cs
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+		                                
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="Title">
+                    Ai
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                Moving Platforms before Entropy
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+
+                                
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+		                                platform.<b style="color:rgb(74, 207, 185)">m_time</b> = std::clamp(platform.<b style="color:rgb(74, 207, 185)">m_time</b> += (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div style="width: 30%; height: 100%; padding: 20px; display: inline-block;">
+                <b>
+                    <a href="contacts.html" class="link"> <p> Contacts: </p> </a>
+                    <a href="mailto:tomaswallin8@gmail.com" class="link"> <p> Email: tomaswallin8@gmail.com </p> </a>
+                    <a href="tel:+46761736873" class="link"> <p> Phone: +46 76 173 68 73 </p> </a>
+                    <a href="https://github.com/Plantds" class="link"> <p> Github: Plantds </p> </a>
+                    <a href="https://www.linkedin.com/in/tomas-wallin-192392387/" class="link"> <p> Linkedin: Tomas Wallin</p> </a>
+                </b>
+                </div>
+            <div style="padding: 20px; display: inline-block; height: 100%;">
+               <a href="#top" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
+            </div>
+        </footer>
+    </body>
+    <script src="/scripts/do_to_ascii.js"></script>
+    <script src="/scripts/Box_ascii.js"></script>
+</html>

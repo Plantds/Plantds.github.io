@@ -255,7 +255,7 @@
                                 
                                 <div class="imagecontrainer">
                                     <div class="Imgae" style="max-width: 1000px;">
-                                        <video src="EVids/2026-04-23 18-21-57.mp4" style="width: 100%; height: 100%;" controls>
+                                        <video style="width: 100%; height: 100%;" controls>
                                             <source src="https://github.com/Plantds/Plantds.github.io/blob/main/pages/Entropy/EVids/2026-04-23%2018-21-57.mp4?raw=true" type="video/mp4">
                                         </video>
                                     </div>
@@ -296,7 +296,7 @@
                             <div class="Text">
                                 <div class="imagecontrainer">
                                     <div class="Imgae" style="max-width: 1000px;">
-                                        <video src="EVids/freeze.mp4" style="width: 100%; height: 100%;" controls>
+                                        <video style="width: 100%; height: 100%;" controls>
                                             <source src="https://github.com/Plantds/Plantds.github.io/blob/main/pages/Entropy/EVids/freeze.mp4?raw=true" type="video/mp4">
                                         </video>
                                     </div>
@@ -338,40 +338,154 @@
                                 All the programmers did this and thats how we got the <a href="EImages/bug2.png" download class="link" style="color: rgb(143, 201, 181);"><b style="color: rgb(143, 201, 181);">*bugs*</b> </a> you can see in entropy into the game.<br>
                                 So good thing came out of it in the end.<br>
                                 <br>
-                                Does this spline generator work? no. Splines are werid, it was really hard to understand how to add points to them in the correct space.    
+                                Does this spline generator work? no. Splines are werid, it was really hard to understand how to add points to them in the correct space.
+                                <br> <br>
+                                That was me last week I just made it work.. so from this on this is the <b style="color:rgb(255, 233, 0);">*</b>improved<b style="color:rgb(255, 233, 0);">*</b> verstion.
 
                                 <div class="imagecontrainer">
                                     <div class="Imgae" style="max-width: 1000px;">
-                                        <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                                        <video src="EVids/freeze.mp4" style="width: 100%; height: 100%;" controls>
+                                            <source src="https://github.com/Plantds/Plantds.github.io/blob/main/pages/Entropy/EVids/pathGen.mp4?raw=true" type="video/mp4">
+                                        </video>
                                     </div>
                                 </div>
 
+                                now for the best part the <b style="color:rgb(255, 233, 0);">*</b>code<b style="color:rgb(255, 233, 0);">*</b>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/createSplineStart.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                First we need to make sure that the spline doesnt have any points so we clear it out. <br>
+                                Then we cast a line forward from the actor, the red arrow in this case. We use the hit point to spawn a spline point slightly above the impact point. <br>
+                                We store this point for later in <b style="color: rgb(74, 143, 221); font-family: monospace;"> Previus Hit</b>.
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/MakeDegrees.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                Here we calcualte the degrees we want to fire at later when we are checking for more places to potanialy place a point.<br>
+                                This will be reused a lot so instead of recreating the same math each time we want to check for points we just do it once and add it to an array called <b style="color:rgb(37, 151, 37); font-family: monospace;">Array of Degrees</b> <br>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/PointLoop.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                Here we set up the first loop, this one is just per point we want to make.<br>
+                                We use the index from the loop to get the spline point, this will always be the lates spline point made. In this case the one we just made nummber 0.<br>
+                                We have to use its postion for later so lets call that <b style="color: rgb(255, 196, 0); font-family: monospace;"> IndexPos</b> for simplisty of reading.<br>
+                                <br>
+                                the loop after looks odd but ill explain it, this is where we fire out in a cake slice of degrees to check where we can place a point.<br>
+                                The stuff bellow it is just a check to see if we hit something or not if we didnt we try again but with a little difference.<br>
+                                For now just remeber <b style="color: rgb(122, 200, 202); font-family: monospace;"> Bend Mutli</b>.
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/cakeslice.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/Segment Cast into cake slice.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                Here we use the <b style="color:rgb(37, 151, 37); font-family: monospace;">Array of Degrees</b> and the <b style="color: rgb(108, 172, 108); font-family: monospace">Max angle</b>
+                                to rotate the end point in this, soon to be, line trace around the arrows forward vector to split them into a cake slice shape that can be bigger or smaller deppending on settings.<br> 
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/angletoObject.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                After we have made the cake slice we angle it so that its flush with the object we have hit so we can find the next spline point.<br>
+                                We do this by taking the <b style="color: rgb(74, 143, 221); font-family: monospace;"> Previus Hit</b> <b style="color: rgb(230, 171, 82); font-family: monospace;">impact normal</b> and corssing it with the forward vector of the arrow, this create a right vector for use to roate around.<br>
+                                We calcualte how much we need to roate by taking the <b style="color: rgb(230, 171, 82); font-family: monospace;">impact normal</b>  and a negated forward of the arrow and doting them, take this dot prodoct and put it into ACOSd
+                                which returns us the degrees we need to rotate by.<br>
+                                This does have a problem tho if the dot prodoct is near or equal to 1 then the calcualtions we are going to do after all break so we need this branch statement (if) to just make sure we use a different math if this is true.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/dotCheck.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                <div style="margin: 75px;">
+                                </div>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/bend.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                Here is where the <b style="color: rgb(122, 200, 202); font-family: monospace;"> Bend Mutli</b> again and here is where it is used. See the bend multi bends end point of the rays towards the object that the 
+                                <b style="color: rgb(74, 143, 221); font-family: monospace;"> Previus Hit</b> gives us. <br>
+                                We do this by using the eariler cross product. Then bend multi only goes up if we fail to hit anything so here we shit the rays over and over and over until we have a cake slice that is a hit slice.<br>
+                                <br>
+                                after this we actually fire the ray and if they hit something we add it to an array of hits.<br>
+
+                                <div style="margin: 75px;">
+                                </div>
+
+                                Remeber the part where I talked about how if the dotproduct is to close to 1 we need to think diffrently well here it is.<br>
+                                
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/dotfix2.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                This skips doint the dot rotation becouse this 1 dot issue is not rare but is predicatable so we can fake it.<br>
+                                This rotates the fire around right vector relative to the impact <br>
+                                See the dot being equall to 1 means that the <b style="color: rgb(230, 171, 82); font-family: monospace;">impact normal</b> and the forawrd of the actor is the same and that breaks things when we cross them. <br>
+                                So we instead use the up vector and the <b style="color: rgb(230, 171, 82); font-family: monospace;">impact normal</b> crossing them to create a right vector. <br>
+                                We use this right vector to rotate the lines instead making the shake fallow the object like this.
+                                
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/dotfixshowoff.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                
+                                now we can go up this straight impact point.<br>
+
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="EImages/splinelast.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+
+                                Lastly we take a random hit to make a spline point and reset all the needed values to make a new one. 
                             </div>
                         </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="Title">
-                    Improved Platforms 
-                </div>
-                
-                <div class="Card">
-                    <div class="CardInfoContainer">
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                             <div class="TextBox">
-                                <div class="Text">
-                                    <div class="imagecontrainer">
-                                        <div class="Imgae" style="max-width: 1000px;">
-                                            <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                <!--
+                    <div class="Title">
+                        Improved Platforms 
+                    </div>
+                    
+                    <div class="Card">
+                        <div class="CardInfoContainer">
+                            <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                                <div class="TextBox">
+                                    <div class="Text">
+                                        <div class="imagecontrainer">
+                                            <div class="Imgae" style="max-width: 1000px;">
+                                                <img src="EImages/freeze1.png" alt="" style="width: 100%; height: 100%;">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
+                    
+                    -->
             </div>
         </div>
 
