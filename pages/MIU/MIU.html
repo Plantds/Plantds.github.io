@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" href="MIU_Style.css">
     </head>
-    <body class="body" id="top">
+    <body class="body">
         <header class="mainmenu sticky">
             <ul class="headerNav">
                 <li><a href="/index.html">Home</a></li>
@@ -184,6 +184,426 @@
                                 This looks odd but this is a simple swtich statement but when I was making this I had no idea you could use a switch like this.<br>
                                 Depending on what CrouchInput is it will return true or false but this also allows us to make toggle crouch by just fliping the <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b>.<br>
                                 the _ => <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b> looks really werid but is just the defualt case. <br><br>
+
+                                <b> UpdateBody </b> from earlier show up here again and it looks like this 
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                            public void UpdateBody(float deltaTime)<br>
+                                            {<br>
+                                                float currentHeight = motor.Capsule.height;<br>
+                                                float normalizedHeight = currentHeight / standingHight;<br><br>
+                                            
+                                                float cameraTargetHeight = currentHeight * (_state.Stance is Stance.Stand ? standingCameraHeightTarget : crouhCameraHeightTarget);<br>
+                                                Vector3 rootTragetScale = new Vector3(1.0f, normalizedHeight, 1.0f);<br><br>
+                                            
+                                                cameraTarget.localPosition = Vector3.Lerp(<br>
+                                                    a: cameraTarget.localPosition,<br>
+                                                    b: new Vector3(0.0f, cameraTargetHeight, 0.0f),<br>
+                                                    t: 1.0f - Mathf.Exp(-crouchHeightResponse * deltaTime));<br><br>
+                                            
+                                                root.localScale = Vector3.Lerp(<br>
+                                                    a: root.localScale,<br>
+                                                    b: rootTragetScale,<br>
+                                                    t: 1.0f - Mathf.Exp(-crouchHeightResponse * deltaTime));<br>
+                                            }<br>
+                                    </code>
+                                </div>
+                                This updates the player hight and its camera postion but over time using a lerp.<br>
+                                This create a smooth up and down while crouching.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video style="width: 100%; height: 100%;" controls>
+                                            <source src="https://github.com/Plantds/Plantds.github.io/blob/main/pages/MIU/MIU_Vid/crouchUncrouch.mp4?raw=true" type="video/mp4">
+                                        </video>
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                Now lets look at the BeforeCharacterUpdates function, this on is called before we update the players movement. So this happens before we apply anything like position and rotation.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                    public void BeforeCharacterUpdate(float deltaTime)<br>
+                                    {<br>
+                                        _tempState = _state;<br><br>
+                                    
+                                        if (_requestedRun && _state.Stance is Stance.Stand && !_requestedCrouch)<br>
+                                        {<br>
+                                            _state.Stance = Stance.Running;<br>
+                                        }<br><br>
+                                    
+                                        if (_requestedCrouch && (_state.Stance is Stance.Stand || _state.Stance is Stance.Running))<br>
+                                        {<br>
+                                            _state.Stance = Stance.Crouch;<br>
+                                            motor.SetCapsuleDimensions(<br>
+                                                radius: motor.Capsule.radius,<br>
+                                                height: crocuhHight,<br>
+                                                yOffset: crocuhHight * 0.5f<br>
+                                            );<br><br>
+                                        
+                                            root.localPosition = new Vector3(0.0f, 0.5f, 0.0f);<br>
+                                        }<br>
+                                    }<br>
+                                    </code>
+                                </div>
+                                This is just setting up some states that can be called from heldown buttons, so both runing and crouching comes into play here.<br>
+                                AfterCharacterUpdate does basicly the same so im not going to show it.<br><br>
+
+                                So now for the big part <b style="color:rgb(255, 233, 0);">*</b> <b> UpdateVelocity </b> <b style="color:rgb(255, 233, 0);">*</b>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                   public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)<br>
+                                    {<br>
+                                     _state.Acceleration = Vector3.zero;<br>
+                                     Vector3 groundedMovement = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(direction: _requestedmovement, surfaceNormal: motor.GroundingStatus.GroundNormal) * _requestedmovement.magnitude;<br>
+                                     bool moving = groundedMovement.sqrMagnitude > 0;<br>
+                                     if(_state.Stance is Stance.Wallruning) _timeSinceUngrounded = 0.0f;<br>
+                                     if (motor.GroundingStatus.IsStableOnGround)<br>
+                                     {<br>
+                                         _timeSinceUngrounded = 0.0f;<br>
+                                         _ungrounedDueToJump = false;<br>
+                                    </code>
+                                </div>
+                                
+                                First we do some set up, we clear Acceleration and set it to 0, we get the grounded movements direaction by calling the function <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b>.<br>
+                                This function Crosses the direction with the characters up and then takes the resulting vector and crosses that with surfaceNormal. Returning this vecotr normalized for us to use. <br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                    bool running = <b style="color: cadetblue;">_state</b>.Stance is Stance.Running;<br>
+                                    var shouldSlideStart = currentVelocity.magnitude > slideStartFreshold;<br>
+                                    var crouching = <b style="color: cadetblue;">_state</b>.Stance is Stance.Crouch;<br>
+                                    var wasStanding = <b style="color: rgb(209, 206, 102);">_lastState</b>.Stance is Stance.Stand;<br>
+                                    var wasRuning = <b style="color: rgb(209, 206, 102);">_lastState</b>.Stance is Stance.Running;<br>
+                                    var wasInAir = !<b style="color: rgb(209, 206, 102);">_lastState</b>.Grounded;<br>
+                                    </code>
+                                </div>
+
+                                Here we save a bunch of veriabels for later. Almost all of these have something to do with the <b style="color: cadetblue; font-family: monospace;">_state</b> or <b style="color: rgb(209, 206, 102); font-family: monospace;">_lastState</b> veriables which just a saved copy of the enum that saves the players stance, ie crouching, running, wallruning. <br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                    // start slide<br>
+                                    if (moving && crouching && shouldSlideStart && (wasStanding || wasInAir || wasRuning))<br>
+                                    {<br>
+                                        _state.Stance = Stance.sliding;<br><br>
+                                    
+                                        if (wasInAir)<br>
+                                        {<br>
+                                            Vector3 groundNormal = motor.GroundingStatus.GroundNormal;<br>
+                                            Vector3 tangent = Vector3.ProjectOnPlane(<b style="color: rgb(75, 160, 149);">currentVelocity</b>, groundNormal);<br><br>
+                                        
+                                            // Keep tangential (momentum along slope), discard into-ground velocity<br>
+                                            if (tangent.sqrMagnitude > 0.001f)<br>
+                                                <b style="color: rgb(75, 160, 149);">currentVelocity</b> = tangent.normalized * <b style="color: rgb(75, 160, 149);">currentVelocity</b>.magnitude;<br>
+                                        }<br><br>
+                                    
+                                        float <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> = slideStartSpeed;<br>
+                                        if (!<b style="color: rgb(209, 206, 102);">_lastState</b>.Grounded && !_requestedCrouchInAir)<br>
+                                        {<br>
+                                            <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> = 0.0f;<br>
+                                            _requestedCrouchInAir = false;<br>
+                                        }<br>
+                                        float <b style="color:crimson; font-family: monospace;"> slideSpeed</b> = Mathf.Max(<b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>, <b style="color: rgb(75, 160, 149);">currentVelocity</b>.magnitude);<br>
+                                        <b style="color: rgb(75, 160, 149);">currentVelocity</b> = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(<br>
+                                            direction: <b style="color: rgb(75, 160, 149);">currentVelocity</b>,<br>
+                                            surfaceNormal: motor.GroundingStatus.GroundNormal) * <b style="color:crimson; font-family: monospace;"> slideSpeed</b>;<br>
+                                    
+                                    }<br>
+                                    </code>
+                                </div>
+
+                                Here we have the start to <b> Slide </b>. First we just do a check to see if we can slide or not.<br>
+                                If we can slide then we set the stance to slide.<br>
+                                Then we check if we are in were in the air. If we were then we get the ground normal by using the KinematicCharacterMotor.<br>
+                                We project our current velocity onto this groundNormal. We do this to get a perallel vector to the plane we sliding on.<br>
+                                if the tangent is great enough we set the <b style="color: rgb(75, 160, 149);font-family: monospace;">currentVelocity</b>
+                                to be equal to tangent.normalized * <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b>.magnitude. This directs our movementom along the normal of the serfuce we are standing on.<br><br>
+                                
+                                After that we make a float called  <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>. This float will effect the <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b> later
+                                but we make this temperary verstion so we can change it as needed. <br>
+                                So we run a check to see if our <b style="color: rgb(209, 206, 102); font-family: monospace;">_lastState</b> wasnt grounded and _requestedCrouchInAir is false then we set the <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>
+                                to be 0 and flip the _requestedCrouchInAir to be false. This effectevly tells the later code not to use the <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>.<br>
+                                <br>
+                                After that check we now set up another veriable <b style="color:crimson; font-family: monospace;"> slideSpeed</b>, is initiale value being equal to either <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> or 
+                                <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b>.magnitude depending on which is higher in value.<br>
+                                We use the <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b> from before here again. Multiplying ther resulting vector with <b style="color:crimson; font-family: monospace;"> slideSpeed</b>. <br>
+                                Then we are done with slide. <br><br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                    if (_state.Stance is Stance.Stand or Stance.Crouch or Stance.Running)<br>
+                                    {<br>
+                                        float speed = _state.Stance switch<br>
+                                        {<br>
+                                            Stance.Stand => walkSpeed,<br>
+                                            Stance.Crouch => crouchSpeed,<br>
+                                            Stance.Running => runSpeed,<br>
+                                            _ => walkSpeed<br>
+                                        };<br>
+                                        float response = _state.Stance switch<br>
+                                        {<br>
+                                            Stance.Stand => walkResponse,<br>
+                                            Stance.Crouch => crouchResponse,<br>
+                                            Stance.Running => runResponse,<br>
+                                            _ => walkResponse<br>
+                                        };<br><br>
+                                    
+                                        if (!_requestedDash)<br>
+                                        {<br>
+                                            Vector3 tragetVelocity = groundedMovement * speed;<br>
+                                            Vector3 moveVelocity = Vector3.Lerp(<br>
+                                                a: currentVelocity,<br>
+                                                b: tragetVelocity,<br>
+                                                t: 1.0f - Mathf.Exp(-response * deltaTime)<br>
+                                            );<br>
+                                            _state.Acceleration = moveVelocity - currentVelocity;<br>
+                                            currentVelocity = moveVelocity;<br>
+                                        }<br>
+                                    }<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                     else<br>
+                                        {<br>
+                                            currentVelocity -= currentVelocity * (slideFriction * deltaTime);<br><br>
+                                        
+                                            Vector3 forceOnSlope = Vector3.ProjectOnPlane(<br>
+                                                vector: -motor.CharacterUp,<br>
+                                                planeNormal: motor.GroundingStatus.GroundNormal<br>
+                                            ) * slideGravity;<br><br>
+                                        
+                                            currentVelocity -= forceOnSlope * deltaTime;<br><br>
+                                        
+                                            float currentSpeed = currentVelocity.magnitude;<br>
+                                            Vector3 targetVelocity = groundedMovement * currentVelocity.magnitude;<br>
+                                            Vector3 steerVelocity = currentVelocity;<br>
+                                            Vector3 steerForce = (targetVelocity - steerVelocity) * slideSteerAcceleration * deltaTime;<br>
+                                            steerVelocity += steerForce;<br>
+                                            steerVelocity = Vector3.ClampMagnitude(steerVelocity, currentSpeed);<br><br>
+                                        
+                                            _state.Acceleration = (steerVelocity - currentVelocity) / deltaTime;<br>
+                                            currentVelocity = steerVelocity;<br><br>
+                                        
+                                            if (currentVelocity.magnitude < slideEndSpeed) _state.Stance = Stance.Crouch;<br>
+                                        }<br>
+                                    }<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                             else if (_state.Stance is not Stance.Wallruning)<br>
+                                     // air <br>
+                                       _timeSinceUngrounded += deltaTime;<br>
+                                       if (_requestedmovement.sqrMagnitude > 0.0f)<br>
+                                       {<br>
+                                           Vector3 planarMovement = Vector3.ProjectOnPlane(<br>
+                                               vector: _requestedmovement,<br>
+                                               planeNormal: motor.CharacterUp) * _requestedmovement.magnitude;<br><br>
+
+                                           Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(<br>
+                                               vector: currentVelocity,<br>
+                                               planeNormal: motor.CharacterUp);<br><br>
+
+                                           Vector3 movementForce = planarMovement * airAcceleration * deltaTime;<br><br>
+
+                                           if (currentPlanarVelocity.magnitude < airSpeed)<br>
+                                           {<br>
+                                               Vector3 targetPlanarVelocity = currentPlanarVelocity + movementForce;<br><br>
+
+                                               targetPlanarVelocity = Vector3.ClampMagnitude(targetPlanarVelocity, airSpeed);<br><br>
+
+                                               movementForce = targetPlanarVelocity - currentPlanarVelocity;<br>
+                                           }<br>
+                                           else if (Vector3.Dot(currentPlanarVelocity, movementForce) > 0.0f)<br>
+                                           {<br>
+                                               Vector3 constrainedMovementForce = Vector3.ProjectOnPlane(<br>
+                                                   vector: movementForce,<br>
+                                                   planeNormal: currentPlanarVelocity.normalized<br>
+                                               );<br><br>
+
+                                               movementForce = constrainedMovementForce;<br>
+                                           }<br><br>
+
+                                           if (motor.GroundingStatus.FoundAnyGround)<br>
+                                           {<br>
+                                               if (Vector3.Dot(movementForce, currentVelocity + movementForce) > 0.0f)<br>
+                                               {<br>
+                                                   Vector3 obstuctionNormal = Vector3.Cross(<br>
+                                                       motor.CharacterUp,<br>
+                                                       Vector3.Cross(<br>
+                                                           motor.CharacterUp,<br>
+                                                           motor.GroundingStatus.GroundNormal<br>
+                                                       )<br>
+                                                   ).normalized;<br><br>
+
+                                                   movementForce = Vector3.ProjectOnPlane(movementForce, obstuctionNormal);<br>
+                                               }<br>
+                                           }<br><br>
+
+                                           currentVelocity += movementForce;<br>
+                                       }<br>
+                                    </code>
+                                </div>
+                                
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                            float effectiveGravity = gravity;<br><br>
+
+                                            float verticalSpeed = Vector3.Dot(currentVelocity, motor.CharacterUp);<br>
+                                            if (_requestedSustainJump && verticalSpeed > 0.0f) effectiveGravity *= jumpSustainGravity;<br>
+                                            if (dashGravityTimer > 0.0f) effectiveGravity = 0.0f;<br>
+                                            if (_state.Stance is Stance.Wallruning) effectiveGravity = 0.0f;<br><br>
+
+                                            currentVelocity += motor.CharacterUp * effectiveGravity * deltaTime;<br><br>
+
+                                        }<br><br>
+
+                                        RaycastHit rightHit;<br>
+                                        RaycastHit leftHit;<br>
+                                        bool rightWall = Physics.Raycast(transform.position, motor.CharacterRight, out rightHit, wallStartDistance, wall);<br>
+                                        bool leftWall = Physics.Raycast(transform.position, -motor.CharacterRight, out leftHit, wallStartDistance, wall);<br>
+                                    </code>
+                                </div>
+
+                                 <div class="codeCase">
+                                    <code class="CPPCode">
+                                    if (_requestedJump)<br>
+                                    {<br>
+                                        if (_state.Stance is not Stance.Wallruning)<br>
+                                        {<br>
+                                            bool grounded = motor.GroundingStatus.IsStableOnGround;<br>
+                                            bool canCoyoteJump = _timeSinceUngrounded < coyoteTime && !_ungrounedDueToJump;<br>
+                                            if (grounded || canCoyoteJump)<br>
+                                            {<br>
+                                                _requestedJump = false;<br>
+                                                _requestedCrouch = false;<br>
+                                                _requestedCrouchInAir = false;<br><br>
+                                            
+                                                motor.ForceUnground(time: 0.0f);<br>
+                                                _ungrounedDueToJump = true;<br><br>
+                                            
+                                                float currentVerticalSpeed = Vector3.Dot(currentVelocity, motor.CharacterUp);<br>
+                                                float targetVerticalSpeed = Mathf.Max(currentVerticalSpeed, jumpSpeed);<br><br>
+                                            
+                                                currentVelocity += motor.CharacterUp * (targetVerticalSpeed - currentVerticalSpeed);<br>
+                                            }<br>
+                                        }<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                    else if (_state.Stance is Stance.Wallruning)<br>
+                                    {<br>
+                                        bool canCoyoteJump = _timeSinceUngrounded < coyoteTime && !_ungrounedDueToJump;<br>
+                                        if (canCoyoteJump)<br>
+                                        {<br>
+                                            _wallrunColdownTimer = wallrunColdownTime;<br>
+                                            _requestedJump = false;<br><br>
+                                        
+                                            _ungrounedDueToJump = true;<br><br>
+                                        
+                                            Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal;<br>
+                                            Vector3 combinedDir = motor.CharacterUp + (wallNormal * 0.3f);<br><br>
+                                        
+                                            currentVelocity += combinedDir * jumpSpeed;<br>
+                                        }<br>
+                                    }<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        else<br>
+                                        {<br>
+                                            bool canJumpLater = _timeSinceJumpRequest < coyoteTime;<br>
+                                            _requestedJump = canJumpLater;<br>
+                                            _timeSinceJumpRequest += deltaTime;<br>
+                                        }<br>
+                                    }<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                               if (_requestedDash && currentDashesLeft > 0)<br>
+                                        {<br>
+                                            if (_state.Stance is Stance.Wallruning)<br>
+                                            {<br>
+                                                _state.Stance = Stance.Dashing;<br>
+                                                _wallrunColdownTimer = wallrunColdownTime;<br>
+                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal; // normals can at time point towards the wall fuck<br><br>
+                                            
+                                                Vector3 comebinedDir = (wallNormal * 0.3f) + motor.CharacterForward.normalized;<br><br>
+                                            
+                                                currentVelocity = new Vector3(0.0f, currentVelocity.y, currentVelocity.z);<br><br>
+                                            
+                                                currentVelocity += comebinedDir * airDashSpeed;<br>
+                                            }<br>
+                                            else<br>
+                                            {<br>
+                                                _state.Stance = Stance.Dashing;<br>
+                                                Vector3 groundedForward = motor.GetDirectionTangentToSurface(direction: motor.CharacterForward, surfaceNormal: motor.GroundingStatus.GroundNormal);<br>
+                                                motor.ForceUnground(time: 0.0f);<br><br>
+                                            
+                                                float effectiveDashSpeed = motor.GroundingStatus.IsStableOnGround ? groundDashSpeed : airDashSpeed;<br><br>
+                                            
+                                                if (groundedMovement.magnitude > 0.0f) currentVelocity += groundedMovement * effectiveDashSpeed;<br>
+                                                else currentVelocity += groundedForward * effectiveDashSpeed;<br>
+                                            }<br><br>
+                                        
+                                            currentDashesLeft--;<br>
+                                            _requestedDash = false;<br>
+                                        }<br>
+                                        if (currentDashesLeft == 0) _requestedDash = false;<br>
+                                    </code>
+                                </div>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        // wallruning<br>
+                                        if (!motor.GroundingStatus.IsStableOnGround && _wallrunColdownTimer < 0.0f && _state.Stance is not Stance.Dashing && !_requestedJump && _isGettingMovementInput && (currentVelocity.sqrMagnitude > wallrunFrechold || _state.Stance is Stance.Running) && (rightWall || leftWall))<br>
+                                        {<br>
+                                            {// start wallrun<br>
+                                                _state.Stance = Stance.Wallruning;<br>
+                                                _ungrounedDueToJump = false;<br>
+                                                currentVelocity = new Vector3(currentVelocity.x, 0.0f, currentVelocity.z);<br>
+                                            }<br>
+                                            {// during wallrun<br>
+                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal;<br>
+                                                Vector3 wallForward = Vector3.Cross(wallNormal, motor.CharacterUp);<br><br>
+                                            
+                                                float chosenStartSpeed = Mathf.Max(wallrunStartSpeed, currentVelocity.magnitude);<br>
+                                                float effectiveWallrunSpeed = Mathf.Lerp(<br>
+                                                    a: chosenStartSpeed,<br>
+                                                    b: wallrunEndSpeed,<br>
+                                                    t: 1.0f - Mathf.Exp(-walkResponse * deltaTime));<br><br>
+                                            
+                                                Vector3 effectiveForward = (motor.CharacterForward - wallForward).magnitude > (motor.CharacterForward - -wallForward).magnitude ? -wallForward : wallForward;<br><br>
+                                            
+                                                Vector3 tragetVelocity = (effectiveForward + groundedMovement).normalized * effectiveWallrunSpeed;<br>
+                                                Vector3 moveVelocity = Vector3.Lerp( // not learping shit huh<br>
+                                                    a: currentVelocity,<br>
+                                                    b: tragetVelocity,<br>
+                                                    t: 1.0f - Mathf.Exp(-wallrunResponse * deltaTime)<br>
+                                                );<br>
+                                                _state.Acceleration = moveVelocity - currentVelocity;<br>
+                                                currentVelocity = moveVelocity;<br>
+                                            }<br>
+                                        }<br>
+                                        else if (_state.Stance is Stance.Wallruning && !rightWall && !leftWall || _state.Stance is Stance.Wallruning && !_isGettingMovementInput)<br>
+                                        {<br>
+                                            _wallrunColdownTimer = wallrunColdownTime;<br>
+                                            _state.Stance = Stance.Stand;<br>
+                                        }<br><br>
+                                        
+                                    }<br>
+                                    </code>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -197,7 +617,7 @@
                     <div class="CardInfoContainer">
                         <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
                             <div class="MinorTitle">
-                                Moving Platforms before Entropy
+                                core
                             </div>
                         </div>
                         <div class="TextBox">
@@ -213,6 +633,32 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="Title">
+                    Guns
+                </div>
+
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                core
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+
+                                
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+		                                platform.<b style="color:rgb(74, 207, 185)">m_time</b> = std::clamp(platform.<b style="color:rgb(74, 207, 185)">m_time</b> += (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                
             </div>
         </div>
@@ -228,7 +674,7 @@
                 </b>
                 </div>
             <div style="padding: 20px; display: inline-block; height: 100%;">
-               <a href="#top" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
+               <a href="" class="link"> <p> You are quite far down. Why dont you go back to the top?</p> </a>
             </div>
         </footer>
     </body>
