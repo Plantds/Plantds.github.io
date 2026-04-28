@@ -250,6 +250,7 @@
                                This is a <b> personal project </b> I did in school at <a href="https://www.playgroundsquad.com/" class="link"> <b> PSQ </b> </a>. I enjoy physic based movement, I think its really cool so making movement in untiy was an easy choice for this personal project.<br>
                                <br>
                                This project used <a class="link" href="https://youtu.be/NsSk58un8E0?si=giAOtVJGlJwvLxte"> <b> this </b> </a> tutorial video. I ended up learning a lot, the thing I took with me the most was the costom shader they used as a debug tool, I think that was really neat. <br>
+                               The movement uses the <a class="link" href="https://assetstore.unity.com/packages/tools/physics/kinematic-character-controller-99131">kinematic character controller</a>, a low-level character controller.<br> 
                             </p>
                         </div>
 
@@ -266,15 +267,16 @@
                             <p style="font-size: 25px;"> <b> Movement </b> </p>
                             <p class="gs_smalltext">
                                 This <b> movement </b> contains: <br>
-                                Sprinting <br>
-                                Jumping <br>
-                                Dashing <br>
-                                Crouching <br>
-                                Sliding <br>
+                                Sprinting - normal sprinting<br>
+                                Jumping - like most games<br>
+                                Dashing - an impulse of speed in your look diraction but placed on a flat plane (you cant gain hight from it)<br>
+                                Crouching - lowers the camera and the player hight<br>
+                                Sliding - allows you to slide down object to gain momentum <br>
+                                Wallruning - allwos you to run along a wall <br>
                                 <br>
-                                I like how unity does movement, Ive work with it before and I always enjoy learning more about it.<br> <br>
-                                This Player would be best for a fast pased game with a lot area to run around in. <br> <br>
-                                The best part about this whole project was still the shader that shows where you can and can not walk, I love it with all my heart. <br> <br>
+                                I like how unity does movement, Ive work with it before and I always enjoy learning more about it.<br> 
+                                This Player would be best for a fast pased game with a lot area to run around in. <br> 
+                                The best part about this whole project was still the shader that shows where you can and can not walk, I love it with all my heart. <br> 
                             </p>
                         </div>
 
@@ -287,7 +289,24 @@
                             <p style="font-size: 25px;"> <b> NPC </b> (Unfinnished/Unimplemented) </p>
                             <p class="gs_smalltext">
                                 <b> NPC </b> are diffcult to make good, I managed to get this npc to be able to run to cover and shot at the player... but not at the same time. <br> <br>
-                                I am thinking of revisting NPC's in unity becouse I think npc and npc behavior is really cool.
+                                I am thinking of revisting NPC's in unity becouse I think npc and npc behavior is really cool.<br>
+                                For now the NPC just walks from a to b, b being the cover it can find. It is meant to find cover then hid and shot at the player but it never seems to go into shoting the player state. <br>
+                            </p>
+                        </div>
+
+                        
+                        <div class="GameSummary">
+                            <div class="vidCenterContainer">
+                                <img src="MIU/MIU_Imges/GUN.png">
+                            </div>
+                            <p style="font-size: 25px;"> <b> Guns </b> </p>
+                            <p class="gs_smalltext">
+                                I made a gun system by fallowing <b> <a class="link" href="https://www.youtube.com/playlist?list=PLllNmP7eq6TQJjgKJ6FKcNFfRREe_L6to"> this </a> </b> tutorial.<br>
+                                Its really modular and it easy to add more weapons as needed. They are made up of 3 scriptable objects.<br>
+                                Gun - which contains setting such as type, impact type, ammo, spawn point and rotation.<br>
+                                Shoot Configuration - which contains setting such as hit mask (what this can hit), fire rate, recoil recovery and spread.<br>
+                                Trail - which contains setting such as material, width, duration, color and speed. <br>
+
                             </p>
                         </div>
 

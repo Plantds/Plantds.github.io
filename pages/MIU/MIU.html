@@ -41,12 +41,149 @@
                         </div>
                         <div class="TextBox">
                             <div class="Text">
-                                
+                                Veriables
                                 <div class="codeCase">
                                     <code class="CPPCode">
-		                                
+		                                [Header("Miscellaneous")]<br>
+                                        [SerializeField] private PlayerCharacter playerCharacter;<br>
+                                        [SerializeField] private cutAndParry cutAndParry;<br>
+                                        [SerializeField] private PlayerCamera playerCamera;<br>
+                                        [SerializeField] private CameraSpring cameraSpring;<br>
+                                        [SerializeField] private cameraLean cameraLean;<br><br>
+                                                                            
+                                        [Header("Input")]<br>
+                                        [SerializeField] private bool toggleCrouchSlide = false;<br>
+                                        [SerializeField] private bool toggleRun = false;<br><br>
+                                                                            
+                                        private IA_AdvancedPlayer _inputActions;<br>
                                     </code>
                                 </div>
+                                Everything under miscellaneous doesnt really matter that much they just reference the other scripts that make up the player character.<br>
+                                I am usuing the Input Actions or IA that unity has for this project. They are very simular to unreals input actions.<br><br>
+                                
+                                <b>Start</b> just Initializes a bunch of these codes or makes new once so im gonna skip it.<br><br>
+                                
+                                <b> Update </b> how ever does do a few things so lets look at that.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+		                                    void Update()<br>
+                                            {<br>
+                                                var <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> = _inputActions.player;<br>
+                                                var deltaTime = Time.deltaTime;<br><br>
+                                            
+                                                // get camera input and updates its rotation<br>
+                                                var cameraInput = new CameraInput { lookVec = <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.look.ReadValue<Vector2>() };<br>
+                                                playerCamera.UpdateRotation(cameraInput);<br><br>
+                                                
+                                    </code>
+                                </div>
+                                First we store the players <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> this frame and the delta time.<br>
+                                Then we use the <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> make a new CameraInput with its look vector being equal to the <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.look value.<br>
+                                After that we call a custom function in the camera to update its rotation using the cameraInput.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                                // get character input and update it<br>
+                                                var characterInput = new CharacterInput<br>
+                                                {<br>
+                                                    // movement input<br>
+                                                    Rotation = playerCamera.transform.rotation,<br>
+                                                    Move = input.WASD.ReadValue<Vector2>(),<br>
+                                                    Jump = input.jump.WasPressedThisFrame(),<br>
+                                                    JumpSustain = input.jump.IsPressed(),<br>
+                                                    Crouch = toggleCrouchSlide ? (input.crouch_slide.WasPressedThisFrame() ? CrouchInput.toggle : CrouchInput.None) : (input.crouch_slide.IsPressed() ? CrouchInput.Crouch : CrouchInput.Uncrouch),<br>
+                                                    Run = toggleRun ? (input.run.WasPressedThisFrame() ? RunInput.toggle : RunInput.None) : (input.run.IsPressed() ? RunInput.Run : RunInput.Unrun),<br>
+                                                    Dash = input.dash.WasPressedThisFrame(),<br>
+                                                };<br><br>
+                                            
+                                                var weaponInput = new weaponInput<br>
+                                                {<br>
+                                                    // Gameplay input<br>
+                                                    Cut = input.cut.WasPressedThisFrame(),<br>
+                                                    Parry = input.parry.WasPerformedThisFrame(),<br>
+                                                    Sheath = input.Sheath.WasPerformedThisFrame()<br>
+                                                };<br><br>
+                                    </code>
+                                </div>
+                                
+                                Here we make a new characterInput struct and fill in with information based of if an <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.veriable was pressed this frame or not. <br>
+                                Their are some expections to this, like rotation is just grabed from the camera or JumpSustain is just shaking if was pressed or not.<br>
+                                The one line I want to look closer at is the Run/Crouch inputs, see they are both togglable so they need some extra lines.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                                    Crouch = toggleCrouchSlide ? (input.crouch_slide.WasPressedThisFrame() ? CrouchInput.toggle : CrouchInput.None) : (input.crouch_slide.IsPressed() ? CrouchInput.Crouch : CrouchInput.Uncrouch),<br>
+                                    </code>
+                                </div>
+                                This statement is just trying to get what value the crouch should be. We use the "?" operator multiple times to get the answer we want.<br>
+                                the "?" operatror is an if statement for a variable basicly; (statement) ? true : false; if statement is true return the left most value other wise return the right most.<br>
+                                The first ? operator checks if we have crouch toggled or not. The secound ? operator just turns the crouch on or off.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                                playerCharacter.UpdateInput(characterInput);<br>
+                                                playerCharacter.UpdateBody(deltaTime);<br><br>
+                                            
+                                                cutAndParry.UpdateWeaponInput(weaponInput);<br><br>
+                                            
+                                        #if UNITY_EDITOR<br>
+                                                if (Keyboard.current.tKey.wasPressedThisFrame)<br>
+                                                {<br>
+                                                    var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);<br>
+                                                    if (Physics.Raycast(ray, out var hit))<br>
+                                                    {<br>
+                                                        Teleport(hit.point);<br>
+                                                    }<br>
+                                                }<br>
+                                        #endif<br>
+                                            }<br>
+                                    </code>
+                                </div>
+                                We call the player character to update its inputs and then its body, a function we will see later.<br>
+                                After that we do the weapon inputs but also have a debug key that allows us to Teleport to where a ray hits in the scene.<br>
+                                This is very usefull becouse of how our terrain looks in the game.<br><br>
+
+                                <b>LateUpdate</b> is what comes next.
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                     void LateUpdate()<br>
+                                    {<br>
+                                        var deltaTime = Time.deltaTime;<br>
+                                        var cameraTarget = playerCharacter.getCameraTarget();<br>
+                                        var state = playerCharacter.GetState();<br><br>
+                                    
+                                        playerCamera.UpdatePosition(cameraTarget);<br>
+                                        cameraSpring.UpdateSpring(deltaTime, cameraTarget.up);<br>
+                                        cameraLean.UpdateSpring(deltaTime, state.Stance is Stance.sliding, state.Acceleration, cameraTarget.up);<br>
+                                    }<br>
+                                    </code>
+                                </div>
+                                in here we just call a bunch of function inside other scripts that make up the player. Here is where we update the camera, we do this here so that we know that all the movement callculation have been done this frame and now can just move the camera smoothly.<br>
+                            </div>
+                        </div>
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                PlayerCharacter.cs
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                The actual meat of the character movement happens in this script. Think of player.cs as a manger calling all the other scripts as needed.<br>
+                                Let's being with<b> UpdateInput</b>, now this function updates a bunch of veriabels so I wont show all of it but I wanna show a part of it that I really find cool <br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                            bool wasReqestingCrouch = <b style="color: darkcyan;"> _requestedCrouch</b>;<br>
+                                            <b style="color: darkcyan;"> _requestedCrouch</b> = input.Crouch switch<br>
+                                            {<br>
+                                                CrouchInput.toggle => !<b style="color: darkcyan;"> _requestedCrouch</b>,<br>
+                                                CrouchInput.None => <b style="color: darkcyan;"> _requestedCrouch</b>,<br><br>
+                                            
+                                                CrouchInput.Crouch => true,<br>
+                                                CrouchInput.Uncrouch => false,<br>
+                                                _ => <b style="color: darkcyan;"> _requestedCrouch</b><br>
+                                            };<br>
+                                    </code>
+                                </div>
+                                This looks odd but this is a simple swtich statement but when I was making this I had no idea you could use a switch like this.<br>
+                                Depending on what CrouchInput is it will return true or false but this also allows us to make toggle crouch by just fliping the <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b>.<br>
+                                the _ => <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b> looks really werid but is just the defualt case. <br><br>
                             </div>
                         </div>
                     </div>
