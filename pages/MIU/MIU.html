@@ -255,8 +255,8 @@
                                    public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)<br>
                                     {<br>
                                      _state.Acceleration = Vector3.zero;<br>
-                                     Vector3 groundedMovement = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(direction: _requestedmovement, surfaceNormal: motor.GroundingStatus.GroundNormal) * _requestedmovement.magnitude;<br>
-                                     bool moving = groundedMovement.sqrMagnitude > 0;<br>
+                                     Vector3 <b style="color: red; font-family: monospace;">groundedMovement</b> = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(direction: _requestedmovement, surfaceNormal: motor.GroundingStatus.GroundNormal) * _requestedmovement.magnitude;<br>
+                                     bool moving = <b style="color: red; font-family: monospace;">groundedMovement</b>.sqrMagnitude > 0;<br>
                                      if(_state.Stance is Stance.Wallruning) _timeSinceUngrounded = 0.0f;<br>
                                      if (motor.GroundingStatus.IsStableOnGround)<br>
                                      {<br>
@@ -267,7 +267,7 @@
                                 
                                 First we do some set up, we clear Acceleration and set it to 0, we get the grounded movements direaction by calling the function <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b>.<br>
                                 This function Crosses the direction with the characters up and then takes the resulting vector and crosses that with surfaceNormal. Returning this vecotr normalized for us to use. <br>
-
+                                <br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                     bool running = <b style="color: cadetblue;">_state</b>.Stance is Stance.Running;<br>
@@ -278,9 +278,8 @@
                                     var wasInAir = !<b style="color: rgb(209, 206, 102);">_lastState</b>.Grounded;<br>
                                     </code>
                                 </div>
-
                                 Here we save a bunch of veriabels for later. Almost all of these have something to do with the <b style="color: cadetblue; font-family: monospace;">_state</b> or <b style="color: rgb(209, 206, 102); font-family: monospace;">_lastState</b> veriables which just a saved copy of the enum that saves the players stance, ie crouching, running, wallruning. <br>
-
+                                <br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                     // start slide<br>
@@ -312,7 +311,6 @@
                                     }<br>
                                     </code>
                                 </div>
-
                                 Here we have the start to <b> Slide </b>. First we just do a check to see if we can slide or not.<br>
                                 If we can slide then we set the stance to slide.<br>
                                 Then we check if we are in were in the air. If we were then we get the ground normal by using the KinematicCharacterMotor.<br>
@@ -329,6 +327,7 @@
                                 <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b>.magnitude depending on which is higher in value.<br>
                                 We use the <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b> from before here again. Multiplying ther resulting vector with <b style="color:crimson; font-family: monospace;"> slideSpeed</b>. <br>
                                 Then we are done with slide. <br><br>
+
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                     if (_state.Stance is Stance.Stand or Stance.Crouch or Stance.Running)<br>
@@ -363,6 +362,10 @@
                                     </code>
                                 </div>
 
+                                if the player is currently standing, crouching or running while on the ground we get the players speed and response.<br>
+                                then if the player isnt requesting to dash we lerp up our velocity to be our target velocity usuing response to control how fast we will lerp there <br>
+                                Lastly we set our acceleration and velocity.<br><br>
+
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                      else<br>
@@ -376,21 +379,40 @@
                                         
                                             currentVelocity -= forceOnSlope * deltaTime;<br><br>
                                         
-                                            float currentSpeed = currentVelocity.magnitude;<br>
-                                            Vector3 targetVelocity = groundedMovement * currentVelocity.magnitude;<br>
-                                            Vector3 steerVelocity = currentVelocity;<br>
-                                            Vector3 steerForce = (targetVelocity - steerVelocity) * slideSteerAcceleration * deltaTime;<br>
-                                            steerVelocity += steerForce;<br>
-                                            steerVelocity = Vector3.ClampMagnitude(steerVelocity, currentSpeed);<br><br>
+                                            float <b style="color: cadetblue; font-family: monospace;">currentSpeed</b> = currentVelocity.magnitude;<br>
+                                            Vector3 <b style="color: aqua; font-family: monospace;">targetVelocity</b> = <b style="color: red; font-family: monospace;">groundedMovement</b> * <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>;<br>
+                                            Vector3 <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> = currentVelocity;<br>
+                                            Vector3 <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> = (<b style="color: aqua; font-family: monospace;">targetVelocity</b> - <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>) * slideSteerAcceleration * deltaTime;<br>
+                                            <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> += <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b>;<br>
+                                            <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> = Vector3.ClampMagnitude(<b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>, <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>);<br><br>
                                         
-                                            _state.Acceleration = (steerVelocity - currentVelocity) / deltaTime;<br>
-                                            currentVelocity = steerVelocity;<br><br>
+                                            _state.Acceleration = (<b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> - currentVelocity) / deltaTime;<br>
+                                            currentVelocity = <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>;<br><br>
                                         
                                             if (currentVelocity.magnitude < slideEndSpeed) _state.Stance = Stance.Crouch;<br>
                                         }<br>
                                     }<br>
                                     </code>
                                 </div>
+
+                                so if we arent in the standing, running or crouching state and we are still on the ground we assume the player is sliding.<br>
+                                We slowly shrink the players velocity down by the slideFriction.<br>
+                                after that we project the characters up vector onto the ground multiplying the result with slide gravity.<br>
+                                We subtract even more from the current velocity, now based on the force down towards the slope.<br>
+                                <br>
+                                Now we want the player to have some abilty to steer during the slide so we do that by first setting up some veriables; <b style="color: aqua; font-family: monospace;">targetVelocity</b>, <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> and <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b>.<br>
+                                <b style="color: aqua; font-family: monospace;">targetVelocity</b> being made up from the <b style="color: red; font-family: monospace;">groundedMovement</b> we made way eariler and the <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>. Getting us the velocity we want to get to.<br>
+                                <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> starts out as just the current velocity but gets updated more and more in this function. This works like and editable snapshot of the velocity veriable.<br>
+                                <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> is the difference between the velocity we want to be at and our current velocity multiplied with the acceleration we give to steer.<br>
+                                <br>
+                                Now that we have done all of this we now edit the <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> to later replace current velocity with this new one.<br>
+                                first we add  <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> to <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>, then making sure to clamp the magnatude <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> so it cant go heigher then the <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>.<br>
+                                <br>
+                                After that we make the acceleration to be equal to difference between <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> and currentVelocity divade by deltaTime.<br>
+                                Then we make currentVelocity to be the same as <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>.<br><br>
+
+                                Lastly we just check if we are to slow to be in slide or not. If we are we go to crouch stance.<br>
+                                <br>
 
                                 <div class="codeCase">
                                     <code class="CPPCode">
