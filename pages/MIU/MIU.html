@@ -424,37 +424,37 @@
                                        _timeSinceUngrounded += deltaTime;<br>
                                        if (_requestedmovement.sqrMagnitude > 0.0f)<br>
                                        {<br>
-                                           Vector3 planarMovement = Vector3.ProjectOnPlane(<br>
+                                           Vector3 <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> = Vector3.ProjectOnPlane(<br>
                                                vector: _requestedmovement,<br>
                                                planeNormal: motor.CharacterUp) * _requestedmovement.magnitude;<br><br>
 
-                                           Vector3 currentPlanarVelocity = Vector3.ProjectOnPlane(<br>
+                                           Vector3 <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> = Vector3.ProjectOnPlane(<br>
                                                vector: currentVelocity,<br>
                                                planeNormal: motor.CharacterUp);<br><br>
 
-                                           Vector3 movementForce = planarMovement * airAcceleration * deltaTime;<br><br>
+                                           Vector3 <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> * airAcceleration * deltaTime;<br><br>
 
-                                           if (currentPlanarVelocity.magnitude < airSpeed)<br>
+                                           if (<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>.magnitude < airSpeed)<br>
                                            {<br>
-                                               Vector3 targetPlanarVelocity = currentPlanarVelocity + movementForce;<br><br>
+                                               Vector3 targetPlanarVelocity = <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br> + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br><br>
 
                                                targetPlanarVelocity = Vector3.ClampMagnitude(targetPlanarVelocity, airSpeed);<br><br>
 
-                                               movementForce = targetPlanarVelocity - currentPlanarVelocity;<br>
+                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = targetPlanarVelocity - <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>;<br>
                                            }<br>
-                                           else if (Vector3.Dot(currentPlanarVelocity, movementForce) > 0.0f)<br>
+                                           else if (Vector3.Dot(<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>, <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
                                            {<br>
                                                Vector3 constrainedMovementForce = Vector3.ProjectOnPlane(<br>
-                                                   vector: movementForce,<br>
-                                                   planeNormal: currentPlanarVelocity.normalized<br>
+                                                   vector: <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>,<br>
+                                                   planeNormal: <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>.normalized<br>
                                                );<br><br>
 
-                                               movementForce = constrainedMovementForce;<br>
+                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = constrainedMovementForce;<br>
                                            }<br><br>
 
                                            if (motor.GroundingStatus.FoundAnyGround)<br>
                                            {<br>
-                                               if (Vector3.Dot(movementForce, currentVelocity + movementForce) > 0.0f)<br>
+                                               if (Vector3.Dot(<b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>, currentVelocity + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
                                                {<br>
                                                    Vector3 obstuctionNormal = Vector3.Cross(<br>
                                                        motor.CharacterUp,<br>
@@ -464,15 +464,24 @@
                                                        )<br>
                                                    ).normalized;<br><br>
 
-                                                   movementForce = Vector3.ProjectOnPlane(movementForce, obstuctionNormal);<br>
+                                                   <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = Vector3.ProjectOnPlane(<b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>, obstuctionNormal);<br>
                                                }<br>
                                            }<br><br>
 
-                                           currentVelocity += movementForce;<br>
+                                           currentVelocity += <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br>
                                        }<br>
                                     </code>
                                 </div>
                                 
+                                Here we have a check is an else if on if we are grounded or not so this first line basically says "if we are not wallruning and are in the air"<br>
+                                First we update a float that keeps track of how long we have been off the ground.<br>
+                                the first if check we see here asked just if we are inputing anything right now. <br>
+                                if we are wanting to move then we create 3 veriables; <br>
+                                <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> out of the 3 veribales this one gets used only to make the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> veriable.
+                                With this veriable we are projecting the movement we want to do unto the character up vector and taking the prodouct of that and multiplying the movement we want to do magnatude. Basicly moving the movement input onto the vector. <br>
+                                <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> is the secound veriable and is also the secound most used. This is also a projection onto a plane but this time usuing the current velocity of the player.<br>
+                                <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> is the most used veriable and is made using <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> multipled with both airAcceleration and deltaTime. This gets us how much we are actually going to accelerate from our requested movement. <br>
+                                <br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                             float effectiveGravity = gravity;<br><br>
