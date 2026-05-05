@@ -434,19 +434,19 @@
 
                                            Vector3 <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> * airAcceleration * deltaTime;<br><br>
 
-                                           if (<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>.magnitude < airSpeed)<br>
+                                           if (<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>.magnitude < airSpeed)<br>
                                            {<br>
-                                               Vector3 targetPlanarVelocity = <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br> + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br><br>
+                                               Vector3 targetPlanarVelocity = <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br><br>
 
                                                targetPlanarVelocity = Vector3.ClampMagnitude(targetPlanarVelocity, airSpeed);<br><br>
 
-                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = targetPlanarVelocity - <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>;<br>
+                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = targetPlanarVelocity - <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>;<br>
                                            }<br>
-                                           else if (Vector3.Dot(<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>, <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
+                                           else if (Vector3.Dot(<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>, <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
                                            {<br>
                                                Vector3 constrainedMovementForce = Vector3.ProjectOnPlane(<br>
                                                    vector: <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>,<br>
-                                                   planeNormal: <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> <br>.normalized<br>
+                                                   planeNormal: <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>.normalized<br>
                                                );<br><br>
 
                                                <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = constrainedMovementForce;<br>
@@ -482,16 +482,28 @@
                                 <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> is the secound veriable and is also the secound most used. This is also a projection onto a plane but this time usuing the current velocity of the player.<br>
                                 <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> is the most used veriable and is made using <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> multipled with both airAcceleration and deltaTime. This gets us how much we are actually going to accelerate from our requested movement. <br>
                                 <br>
+                                Now that we have these veriabels we use the to calcualte how we should be moving in the air.<br>
+                                If our current speed in air is less then air speed we create a target velocity that is just the <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> and the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> combined.<br>
+                                We clamp this ones max speed to be air speed and then take this target air speed minus the <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> and making that the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>.<br>
+                                This effectevly makes <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> the difference between our current velocity and our target velocity.<br><br>
+
+                                Now if during this update we find any ground bellow us, stable or not, we check if the dot prodoct of  <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> and <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> plus <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>
+                                is a postive value.<br>
+                                After this check we do a cross product using another cross product. So inside of the first cross prodcut we cross the characters up vector with the grounds normal vector, taking the resulting vector and crossing that with the characters up.<br>
+                                We normalize all of that so can get a normal vector to project <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> on to.<br><br>
+
+                                and after all of this we finnaly just add to our currentVelocity the resulting <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>. Effectevly allowing us to move in the air.<br><br>
+                                
                                 <div class="codeCase">
                                     <code class="CPPCode">
-                                            float effectiveGravity = gravity;<br><br>
+                                            float <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = gravity;<br><br>
 
                                             float verticalSpeed = Vector3.Dot(currentVelocity, motor.CharacterUp);<br>
-                                            if (_requestedSustainJump && verticalSpeed > 0.0f) effectiveGravity *= jumpSustainGravity;<br>
-                                            if (dashGravityTimer > 0.0f) effectiveGravity = 0.0f;<br>
-                                            if (_state.Stance is Stance.Wallruning) effectiveGravity = 0.0f;<br><br>
+                                            if (_requestedSustainJump && verticalSpeed > 0.0f) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> *= jumpSustainGravity;<br>
+                                            if (dashGravityTimer > 0.0f) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = 0.0f;<br>
+                                            if (_state.Stance is Stance.Wallruning) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = 0.0f;<br><br>
 
-                                            currentVelocity += motor.CharacterUp * effectiveGravity * deltaTime;<br><br>
+                                            currentVelocity += motor.CharacterUp * <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> * deltaTime;<br><br>
 
                                         }<br><br>
 
@@ -502,7 +514,19 @@
                                     </code>
                                 </div>
 
-                                 <div class="codeCase">
+                                Here we create a temperary gravity veriable repricenting <b style="color:rgb(255, 233, 0);">*</b>gravity<b style="color:rgb(255, 233, 0);">*</b>
+                                This will be used to add gravity to the player but changed deppending on what we want. <br><br>
+                                So after we have set <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> to be equall to the gravity veriable we create a verical speed veriable which is the dot product
+                                between our currentVelocity and the character up vector.<br>
+                                After this we check if we are requesting a sustained jump ie player is holding down the jump key and our verticalSpeed is a postive value.
+                                If all of this is true then we multiply <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> with the veriable jumpSustainGravity.<br>
+                                Then we do another check this time checkinh if dashGravityTimer is a postive value, this only being set to a positive value once youve dashed. If we have dashed then we set 
+                                <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> to be nothing.<br>
+                                We do the exact same thing if we are currently wallruning as well.<br>
+                                <br>
+                                After that we do checks left and right of the player to see if there is a wall there or not. This happening only if the player is in air and not already wallruning.<br>
+
+                                <div class="codeCase">
                                     <code class="CPPCode">
                                     if (_requestedJump)<br>
                                     {<br>
