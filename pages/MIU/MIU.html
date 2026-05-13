@@ -552,6 +552,14 @@
                                     </code>
                                 </div>
 
+                                This is where we handel jumping if you are not currently walllruning. <br>
+                                In here we make sure that we are either grounded or that we can coyote jump. Coyote jump just means a bit of time efter leaving the ground where you can still jump. This allows players do not perfectly time their jumps every time they do jump.<br>
+                                If either of these are true then we jump. <br>
+                                We flips some veriables. Then we get our current vertical speed by doting our velocity onto the character up vector.<br>
+                                After that we just pick the larger option between our current vertical speed and the jump. The greater one of the two become our target.<br>
+                                Then we add to the velocity. Now see how I do target - currentVericalspeed. Due to this, we can get either very little of out jumpSpeed or nothing.<br>
+                                currentVerticalSpeed - currentVerticalSpeed = 0 so we wouldnt end up adding anything to the player if they are already travling really fast up wards.<br>
+                                <br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                     else if (_state.Stance is Stance.Wallruning)<br>
@@ -572,6 +580,10 @@
                                     }<br>
                                     </code>
                                 </div>
+                                But if we are wallruning we want to be able to jump as well but with a different target direction.<br>
+                                We do this by getting the wall normal and the characters up, combining them to get our disired direction.<br>
+                                This direction will be the one we use to actually jump.<br>
+                                <br>                                
 
                                 <div class="codeCase">
                                     <code class="CPPCode">
@@ -584,6 +596,9 @@
                                     }<br>
                                     </code>
                                 </div>
+                                
+                                This is just cayote jump stuff. If your time since you requested jump is less then coyote time then _requestedJump will be true else it will be false.<br>
+                                Then we just add to the _timeSinceJumpRequest so its actually incressing<br><br>
 
                                 <div class="codeCase">
                                     <code class="CPPCode">
@@ -619,7 +634,19 @@
                                         if (currentDashesLeft == 0) _requestedDash = false;<br>
                                     </code>
                                 </div>
+                                Here is where we handle the <b style="color:rgb(255, 233, 0);">*</b>dash<b style="color:rgb(255, 233, 0);">*</b>. <br>
+                                The first check is simple if you have asked to dash and have dashes left then we start dashing. <br>
+                                Now their is 2 types of dashes in here. Either a wallrun dash or "normal" dash.<br><br>
 
+                                Lets start with the wallruning one.<br>
+                                first we change the stance. I admit we can move this line one row before and not have to repeat it again later but welp.<br>
+                                We rest the wallrun timer and get the wallrun normal.<br>
+                                Simular to the jump we make a combined dir but this is of that normal and the players forward.<br>
+                                We throw out the right and left momentum of the player setting it to 0. Then we add our dash speed to it <br><br>
+                                
+                                Now if we arent on no wall then we get a grounded forward usuing GetDirectionTangentToSurface() and force the player to no be grounded.<br>
+                                then we do a simple grounded check to get whihch dash speed we should be using.<br>
+                                Now we just dash either in the direction the player is moving or the direction the player is looking.<br><br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                         // wallruning<br>
@@ -662,12 +689,290 @@
                                     </code>
                                 </div>
 
+                                And at last we have wallruning. <br>
+                                we have quite the long if for if we should start the run or not. <br>
+                                1. The player shouldnt be grounded<br>
+                                2. The cooldown for being on a wall should be less then 0 <br>
+                                3. We can not be dashing <br>
+                                4. We can not be requesting <br>
+                                5. We are giving a movement input <br>
+                                6. We either hit the velocity minimum or we are running<br>
+                                7. there is either a wall left or right of us<br>
+                                <br>
+                                Like I said a lot needs to be true for us to do this.<br>
+                                Now wehn we enter a wall run we flip the state, we set the bool _ungrounedDueToJump to false and remeove the up  velocity from out current velocity<br>
+                                After that we get the wallnormal and use it to get the wall forward by crossing it with our up vector.<br>
+                                Then we pick the start speed between either our current velocity or wallrunStartSpeed, depending on which is bigger <br>
+                                After we lerp this speed down over time using a lerp.<br><br>
+                                We create an effective forward by subtracting the the players forward and the walls forward and getting its magnitude. <br>
+                                The after that we do the same but with a negative wallForward.<br>
+                                deppending on which is bigger we either take negative wallForward or posative wallForward. <br> <br>
+
+                                After we have done all of this we create our target velocity by adding our farward and our groundedMovement form way back, normalize the outcome giving us a direction for this velocity.<br>
+                                Then we just multiply in the effective speed and boom target velocity.<br><br>
+
+                                we do another lerp this between our current velocity to our target.<br>
+                                We take the out come and subtract it with our currentVelocity to get our acceleration and the we set our currentVelocity to be the outcome.<br>
+                            </div>
+                        </div>
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                PlayerCamera.cs
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                This this the class that handles the players camera.<br>
+                                I think you could have understoud that by the name but I diagrees.<br><br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        public void Initialize(Transform target)<br>
+                                        {<br>
+                                            transform.position = target.position;<br>
+                                            transform.rotation = target.rotation;<br><br>
+                                        
+                                            transform.eulerAngles = _eulerAngles = target.eulerAngles;<br>
+                                        }<br><br>
+                                    
+                                        public void UpdateRotation(CameraInput input)<br>
+                                        {<br>
+                                            _eulerAngles += new Vector3(-input.lookVec.y, input.lookVec.x) * sensitvity;<br>
+                                            _eulerAngles.x = Mathf.Clamp(_eulerAngles.x, -89.0f, 89.0f);<br>
+                                            transform.eulerAngles = _eulerAngles;<br>
+                                        }<br><br>
+                                    
+                                        public void UpdatePosition(Transform target)<br>
+                                        {<br>
+                                            transform.position = target.position;<br>
+                                        }<br>
+                                    </code>
+                                </div>
+                                Its not a lot of code but the basic jist is just that the camera fallows the target that is set on the player.<br>
+                                And updates the cameras rotation based on the input from the mouse, we do clamp the max x value between -89 and 89 so you cant do cart wheels with the mouse break stuff<br>
+
+                            </div>
+                        </div>
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                CameraSpring.cs
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                Now this looks werid. But let me explain <br>
+                                See our structure in the gmae goes<br>
+                                Player -> HOLDS: Character and Camera<br><br>
+                                Character -> HOLDS: root and Camera Target ( remeber this? )<br>
+                                root -> HOLDS: the player Capsule<br><br>
+                                Camera -> HOLDS: Spring<br>
+                                Spring -> HOLDS: The acutal camera and AttackBoxCenter<br><br>
+                                So this script sits on the spring and the previus script sits on the Camera.<br>
+                                The Camera is moving towards the target. <br>
+                                And the spring is a child of the camera with the actual camera as its child<br><br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        public void UpdateSpring(float deltaTime, Vector3 up)<br>
+                                        {<br>
+                                            transform.localPosition = Vector3.zero;<br><br>
+                                        
+                                            Spring(ref _springPosition, ref _springVelocity, transform.position, halfLife, frequency, deltaTime);<br><br>
+                                        
+                                            var localSpringPosition = _springPosition - transform.position;<br>
+                                            var springHeight = Vector3.Dot(localSpringPosition, up);<br><br>
+                                        
+                                            transform.localEulerAngles = new Vector3(-springHeight * angularDisplacement, 0.0f, 0.0f);<br>
+                                            transform.localPosition = _springPosition * linearDisplacement;<br>
+                                        }<br><br>
+                                    
+                                        private static void Spring(ref Vector3 current, ref Vector3 velocity, Vector3 target, float halfLife, float frequency, float timeStep)<br>
+                                        {<br>
+                                            var dampingRatio = -Mathf.Log(0.5f) / (frequency * halfLife);<br>
+                                            var f = 1.0f + 2.0f * timeStep * dampingRatio * frequency;<br>
+                                            var oo = frequency * frequency;<br>
+                                            var hoo = timeStep * oo;<br>
+                                            var hhoo = timeStep * hoo;<br>
+                                            var detInv = 1.0f / (f + hoo);<br>
+                                            var detX = f * current + timeStep * velocity + hhoo * target;<br>
+                                            var detV = velocity + hoo * (target - current);<br>
+                                            current = detX * detInv;<br>
+                                            velocity = detV * detInv;<br>
+                                        }<br>
+                                    </code>
+                                </div>
+                                So in update spring we are moving the local postion of the spring around usuing a custom function called spring.<br>
+                                So eventougth they are order as they are I'm going to sawp my explation oreder.<br>
+                                Now this is a lot of math to go througth so hold my hand cus im going to need it.<br>
+                                Lets start with what each of these inputs are;<br>
+                                1. current, is the current postion<br>
+                                2. velocity, is the current velocity we are traveling at towards the target <br>
+                                3. target, is where we want to be <br>
+                                4. halfLife, how long it takes for the strength to reach half <br>
+                                5. frequency, how quickly the spring resonates <br><br>
+                                if you want to learn more here is <a class="link" href="http://allenchou.net/2015/04/game-math-precise-control-over-numeric-springing/"> <b> the papper</b></a>.<br>
+                                Cus I can not under any cercumstances do this well.<br>
+                                But this function leads to a very smooth camera exepericance. It has some bouncyness to it.<br><br>
+
+                                Updarespring is really easy<br>
+                                it just updates the spring postion and rotation in the local space.<br>
+                            </div>
+                        </div>
+                       <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                cameraLean.cs
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                this updates the spring as well but instead of in how it fallows the player it leans the camera in reactive ways deppending on your speed and what mode you are in <br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        public void UpdateSpring(float deltaTime, bool sliding, Vector3 acceleration, Vector3 up)<br>
+                                        {<br>
+                                            var planarAcceleration = Vector3.ProjectOnPlane(acceleration, up);<br>
+                                            var damping = planarAcceleration.magnitude > _dampedAcceleration.magnitude ? attackDamping : decaykDamping;<br><br>
+                                        
+                                            _dampedAcceleration = Vector3.SmoothDamp(<br>
+                                                current: _dampedAcceleration,<br>
+                                                target: planarAcceleration,<br>
+                                                currentVelocity: ref _dampedAccelerationVel,<br>
+                                                smoothTime: damping,<br>
+                                                maxSpeed: float.PositiveInfinity,<br>
+                                                deltaTime: deltaTime<br>
+                                            );<br><br>
+                                        
+                                            var leanAxis = Vector3.Cross(_dampedAcceleration.normalized, up);<br><br>
+                                        
+                                            transform.localRotation = Quaternion.identity;<br><br>
+                                        
+                                            var targetStrength = sliding ? slideStrength : walkStrength;<br><br>
+                                        
+                                            _smoothStrength = Mathf.Lerp(_smoothStrength, targetStrength, 1.0f - Mathf.Exp(-strengthResponse * deltaTime));<br><br>
+                                        
+                                            transform.rotation = Quaternion.AngleAxis(-_dampedAcceleration.magnitude * _smoothStrength, leanAxis) * transform.rotation;<br>
+                                        }<br>
+                                    </code>
+                                </div>
+                                First we get the acceleration of the player and project it onto a plane using just an up vector.<br>
+                                Then we get what dappening we want just by checking witch magnitude between the acceleratrion we just made is and dampedAcceleration <br>
+                                then we use the function SmoothDamp to get what _dampedAcceleration should be. This gradualy changes the _dampedAcceleration towards the planarAcceleration<br>
+                                now we make a cross between this _dampedAcceleration and up, this gets us our right vector <br>
+                                We set our transform.localRotation to be equal to a Quaternion.identity, this aligns us with the world axis<br>
+                                We get the target strength depending on if we are sliding or not<br>
+                                Then we smoothly lerp this our current strength towards this target <br>
+                                Then we just rotate around the lean axis with the _dampedAcceleration negative magnitude multiple by the smoothen out strength. Multply all of that with our roation and boom we get this.<br>
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <video style="width: 100%; height: 100%;" controls>
+                                            <source src="https://github.com/Plantds/Plantds.github.io/raw/refs/heads/main/pages/MIU/MIU_Vid/Lean.mp4?raw=true" type="video/mp4">
+                                        </video>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                cutAndParry.cs
+                            </div>
+                        </div>
+
+                        <div class="TextBox">
+                            <div class="Text">
+                                cutAndParry is my attack code, its made to handle the players weapon with would be a simple sword.<br>
+                                I didnt get to far on this but I am remaking this in a project called AfterCut but that is in unreal. <br><br>
+                                We have 3 function in here that have actual code, there is a 4th one but that one is empty and was going to be a parry mechanic <br>
+                                 <div class="codeCase">
+                                    <code class="CPPCode">
+                                        public void UpdateWeaponInput(weaponInput input) //doubles as normal update<br>
+                                        {<br>
+                                            _requestedCut = input.Cut;<br>
+                                            _requestedParry = input.Parry;<br>
+                                            _requestedSheath = input.Sheath;<br>
+                                            _betweenCutsTimer -= Time.deltaTime;<br>
+                                            if (_requestedCut && _betweenCutsTimer < 0.0f) Cut();<br><br>
+                                        
+                                            _sheathTimer -= Time.deltaTime;<br>
+                                            if (_requestedSheath && _sheathTimer < 0.0f) { _sheathTimer = sheathSpeed; _storedSheath = true; }<br>
+                                            if (_sheathTimer < 0.0f && _storedSheath) Sheath();<br><br>
+                                        
+                                            _enemiesCount = _enemies is null ? 0 : _enemies.Count();<br>
+                                        }<br>
+                                    </code>
+                                </div>
+                                Here we are taking in inputs and checking times nothing new. I do have a werid line in here<br>
+                                "_enemiesCount = _enemies is null ? 0 : _enemies.Count()" I think this is just a safty net for if the _enimes doesnt exist but i make it in Initialize so this is just odd<br><br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                         private void Cut()<br>
+                                        {<br>
+                                            _betweenCutsTimer = timeBetweenCuts;<br>
+                                            Vector3 pos = new Vector3(attackBoxCenter.transform.position.x, attackBoxCenter.transform.position.y / 2, attackBoxCenter.transform.position.z);<br>
+                                            var result = this.BoxCast(true, pos, cam.transform.forward, cutBoxSize, cam.transform.rotation, 0.0f, enemy, true);<br>
+                                            for (int i = 0; i < result.Hits.Count() && !_enemies.Exists(x => x.colliderInstanceID == result.Hits[i].colliderInstanceID); i++)<br>
+                                            {<br>
+                                                Debug.Log("observe"); // QUANTUM BALDE WORKS WITH ACTUAL QUANTUM MECHANICS.. somehow<br>
+                                                _enemies.Add(result.Hits[i]);<br>
+                                            }<br>
+                                        }<br>
+                                    </code>
+                                </div>
+                                now this just spawns a box cast infornt of the playe and any enemies inside get added to the list as long as they dont already are a part of the list. <br>
+                                This should be a map.<br>
+                                Worse is im not just saving the enime im saving the racst to it <br>
+                                the debug.log there is also funny, my code decided to not be called untill i did this.<br><br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                            private void Sheath()<br>
+                                            {<br>
+                                                _storedSheath = false;<br>
+                                                foreach (RaycastHit rh in _enemies)<br>
+                                                {<br>
+                                                    rh.collider.gameObject.GetComponent<EnemyScript>().Kill();<br>
+                                                }<br>
+                                                _enemies.Clear();<br>
+                                            }<br>
+                                    </code>
+                                </div>
+                                This is a simple kill all enimes after youve sheath your blade, so I dont kill them on hit I kill them on this call.<br>
+                                I did this way better in the new AfterCut<br><br>
+
+                                That is everything on the player<br>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="Title">
+                    Shader
+                </div>
+                
+                <div class="Card">
+                    <div class="CardInfoContainer">
+                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                            <div class="MinorTitle">
+                                core
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div class="Text">
+                                This is the cool shader that I like 
+                                <div class="imagecontrainer">
+                                    <div class="Imgae" style="max-width: 1000px;">
+                                        <img src="MIU_Imges/Shader.png" alt="" style="width: 100%; height: 100%;">
+                                    </div>
+                                </div>
+                                We just set the angle and it creats an auto red no walk zone.<br>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                 <div class="Title">
+
+                <div class="Title">
                     Ai
                 </div>
                 
