@@ -812,7 +812,7 @@
                                 Cus I can not under any cercumstances do this well.<br>
                                 But this function leads to a very smooth camera exepericance. It has some bouncyness to it.<br><br>
 
-                                Updarespring is really easy<br>
+                                Updating the spring is really easy<br>
                                 it just updates the spring postion and rotation in the local space.<br>
                             </div>
                         </div>
@@ -966,6 +966,13 @@
                                     </div>
                                 </div>
                                 We just set the angle and it creats an auto red no walk zone.<br>
+                                The first part is we take the vertexs normal vector and doting with the worlds up vector, Arccoine it to get radiance out.<br>
+                                We turn the radiance to degres instead so we can use the outcome in a step node.<br>
+                                Doing this to split up the vertex into two sides. These two sides then get colored either red or white.<br>
+                                The lower part just creates a repeating grid texture. We combine these two shader effects to get this cool shader. <br>
+                                <br>
+                                We can now use this shader to show where the player can and cant walk in the world. I think its really cool and it was something I didnt think of doing until I saw it.<br>
+                                Using shaders as a debug tool in this why just makes me kinda happy, you know.<br>
                             </div>
                         </div>
                     </div>
@@ -973,28 +980,100 @@
 
 
                 <div class="Title">
-                    Ai
+                    Enemy Ai
                 </div>
                 
                 <div class="Card">
                     <div class="CardInfoContainer">
                         <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
                             <div class="MinorTitle">
-                                core
+                                EnemyBrain.cs
                             </div>
                         </div>
                         <div class="TextBox">
                             <div class="Text">
 
-                                
+                                The EnemyBrain.cs was made to basicly just start up the ai. The actuall thinking is done in EnemyStateMachine.cs.<br>
+                                EnemyBrain.cs has only really 2 functions. Start and Update<br>
+                                Update calls the statemachine to tick function.<br>
+                                Start looks like this<br>
+
                                 <div class="codeCase">
                                     <code class="CPPCode">
-		                                platform.<b style="color:rgb(74, 207, 185)">m_time</b> = std::clamp(platform.<b style="color:rgb(74, 207, 185)">m_time</b> += (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                            void Start()<br>
+                                            {<br>
+                                                _enemyReferences = GetComponent<<a>EnemyReferences>();<br>
+                                                _enemyStateMachine = new EnemyStateMachine();<br><br>
+                                                
+                                                CoverArea coverArea = FindFirstObjectByType<<a>CoverArea>();<br><br>
+                                                
+                                                // States<br>
+                                                var runToCover = new EnemyState_RunToCover(_enemyReferences, coverArea);<br>
+                                                var delayAfterRun = new EnemyState_Delay(0.1f);<br>
+                                                var inCover = new EnemyState_Cover(_enemyReferences, _enemyStateMachine);<br><br>
+                                                
+                                                _enemyStateMachine.SetState(runToCover);<br><br>
+                                                
+                                                // Transition<br>
+                                                At(runToCover, delayAfterRun, () => runToCover.HasArrivedAtDestination());<br>
+                                                At(delayAfterRun, inCover, () => delayAfterRun.IsDone());<br><br>
+                                                
+                                                void At(IState from, IState to, Func<<a>bool> condition) => _enemyStateMachine.AddTransition(from, to, condition);<br>
+                                                void Any(IState to, Func<<a>bool> condition) => _enemyStateMachine.AddAnyTransition(to, condition);<br>
+                                            }<br>
+                                    </code>
+                                </div>
+                                This really just get the reference to the enemy, creates a new state machine and sets up a few states.<br>
+                                Lets look at the states that are bing made here<br><br>
+                                <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
+                                    <div class="MinorTitle">
+                                        EnemyState_RunToCover.cs
+                                    </div>
+                                </div>
+                                <div class="TextBox">
+                                    <div class="Text">
+                                        before we go into to much of the what and the how of each state I should start by saying that all of these are inharenting from an interaface called iState.<br>
+                                        iState contains 4 functions;<br>
+                                        Tick, bascily this states update cycle <br>
+                                        OnEnter, called once you enter the state<br>
+                                        OnExit, called once you leave the state<br>
+                                        GizmoColor, returns a color for debuging<br><br>
+                                        This is an interface so that I am forced to implement all the functions needed for each state.<br><br>
+                                    <div class="codeCase">
+                                        <code class="CPPCode">
+                                            public void OnEnter()<br>
+                                            {<br>
+                                                Cover nextCover = this._coverArea.GetRandomCover(_enemyReferences.transform.position);<br>
+                                                _enemyReferences._navMeshAgent.SetDestination(nextCover.transform.position);<br>
+                                            }<br>
+                                        </code>
+                                    </div>
+                                    Now how this state works is that once we have entered this state we get a random cover from the _coverArea.<br>
+                                    _coverArea is just a holder of Cover(s) which are just points in space. <br>
+                                    So in essesce, the enmey is just asks for a random point on this cover to walk to.<br>
+                                    then the enemy walks there usuing the navmesh.<br><br>
+                                    <div class="codeCase">
+                                        <code class="CPPCode">
+                                             public bool HasArrivedAtDestination()<br>
+                                            {<br>
+                                                return _enemyReferences._navMeshAgent.remainingDistance <= 0.1f;<br>
+                                            }<br>
+                                        </code>
+                                    </div>
+                                    Now this is a very simple function, but this is not used any where inside of this state of the player. Instead you will see it<br>
+                                </div>
+                            </div>
+                           Here, inside the enmey brain<br>
+                           <div class="codeCase">
+                                    <code class="CPPCode">
+                                            // Transition<br>
+                                            At(runToCover, delayAfterRun, () => runToCover.HasArrivedAtDestination());<br>
+                                            At(delayAfterRun, inCover, () => delayAfterRun.IsDone());<br>
                                     </code>
                                 </div>
                             </div>
-                        </div>
                     </div>
+                </div>
                 </div>
 
                 <div class="Title">
