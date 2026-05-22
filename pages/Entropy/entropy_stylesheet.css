@@ -212,6 +212,58 @@ body.body{
     height: 10px;
 }
 
+.ABox{
+    position: relative;
+    justify-content: center;
+    width: 1px;
+    text-align: center;
+}
+
+.BBox{
+    position: relative;
+    justify-content: center;
+    width: 1px;
+}
+
+.slidecontainer {
+  width: 50%;
+  justify-self: center;
+  margin-bottom: 10px;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background-color: rgb(104, 104, 104);
+  outline: none;
+  opacity: 0.5;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+
+}
+
+.slider:hover {
+  opacity: 0.75;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+
 .link:link{
     color: white;
     background-color: transparent;

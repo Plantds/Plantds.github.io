@@ -34,96 +34,146 @@
                         </div>
                         <div class="TextBox">
                             <div class="Text">
+                                Entropy started out as a 2 week <b style="color: rgb(238, 133, 63);">“learn this engine”</b> project. I was set to make the platforms inside of this game. <br>
+                                Now this was made in a bare bones engine that doesn't have that much for us developers to use. <br>
+                                Normally when making platforms I would use a spline but we didn't have that here but we did have <b style="color:rgb(255, 233, 0);">*</b><b style="color: rgb(69, 134, 69);">Nodes</b><b style="color:rgb(255, 233, 0);">*</b>,
+                                 <b style="color:rgb(255, 233, 0);">*</b><b style="color: rgb(192, 56, 56);">Tags</b><b style="color:rgb(255, 233, 0);">*</b> and <b style="color:rgb(255, 233, 0);">*</b><b style="color: rgb(96, 96, 155);">Display Names</b><b style="color:rgb(255, 233, 0);">*</b>. <br>
+                                I brainstormed with a friend of mine, <b><a class="link" href="https://fil3sav3d.github.io" style="color:rgb(214, 124, 199);">Kjell Hopskin</a></b>, and we figured out a system using these.<br><br>
 
-                                The platforms had an intressting dev time line. See they were made orignally in a proprietary game engine from PSQ. Back when Entropy was a 2 week "get used to this engine" project.<br>
-                                This engine was bare bones and I can not show any code from it becouse NDA but I will still explain everything I can that was within it while not violation said NDA. <br>
-                                The engine had no splines but had <b style="color:rgb(255, 233, 0);">*</b>nodes<b style="color:rgb(255, 233, 0);">*</b>, <b style="color:rgb(255, 233, 0);">*</b>tags<b style="color:rgb(255, 233, 0);">*</b> and <b style="color:rgb(255, 233, 0);">*</b>dispaly names<b style="color:rgb(255, 233, 0);">*</b>. <br>
-                                So with the help of <a style="color: rgb(219, 112, 219);" href="https://fil3sav3d.github.io/" class="link"> <b>Kjell Hopkins</b></a> we ended up figuring out the platfrom sytem. <br>
-                                This was also where we relized the mathmatical problem with lerping over a distance using the same speed, also know as the mathimatical problem. <br> <br> <!-- Remove br once box problem is done -->
+                                The creating platform step by step goes;<br>
+                                <b style="color: rgb(99, 207, 90);">1.</b> create a platform<br>
+                                <b style="color: rgb(99, 207, 90);">2.</b> create points for this platform, tag these points with "<b style="color: rgb(192, 56, 56);">is_point</b>" and the <b style="color: rgb(96, 96, 155);">platforms name</b>. Lastly, make sure to <b style="color: rgb(96, 96, 155);">name the points 0, 1, 2, 3</b>… and so on.<br> 
+                                That's it, that's how the system worked. <br>
+                                <br>
+                                Now the reason behind why you need 2 <b style="color: rgb(192, 56, 56);">tags</b> and a <b style="color: rgb(96, 96, 155);">name</b> like this is because of how the code handles points and platforms.<br>
+                                <br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        auto <b style="color: rgb(228, 224, 16);">searchForPlatformsPoints</b> = [](const std::shared_ptr <b style="color: rgb(69, 134, 69);">_node</b>) { <br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%">
+                                                if (<b style="color: rgb(69, 134, 69);">_node</b>->hasTag("<b style="color: rgb(192, 56, 56);">is_point</b>"))<br>
+                                                {<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%">
+                                                        <b style="color: rgb(69, 134, 69);">_node</b>->setHidden(true);<br>
+                                                        return <b style="color: rgb(125, 125, 209)">true</b>;<br>
+                                                    </blockquote>
+                                                }<br>
+                                                return <b style="color: rgb(125, 125, 209)">false</b>;<br>
+                                            </blockquote>
+                                        };<br><br>
 
-                                <!--
-                                    <div class="ascii_show">
-                                        <div id="BoxProblem">
-                                            <div id="little-box"></div>
-                                        </div>
-                                        <div class="inputSettings">
-                                            <input type="range" name="time" min="0" max="1000" id="boxRange">
-                                            <label for="time" style="font-family: Verdana, Geneva, Tahoma, sans-serif;"> Time </label>
+                                    auto points = _scene.lock()->searchAllNodes(<b style="color: rgb(228, 224, 16);">searchForPlatformsPointsz</b>); 
+                                    </code>
+                                </div>
+                                This is a <b style="color: rgb(243, 123, 33);">Lambda</b> function that just grabs all the nodes with the tag “<b style="color: rgb(192, 56, 56);">is_point</b>” and adds them to a vector of points.<br><br>
+
+                               <div class="codeCase">
+                                     <code class="CPPCode">
+                                        std::sort(points.begin(), points.end(), [](std::shared_ptr<<a><b style="color: rgb(69, 134, 69);">iNode</b>> <b style="color: rgb(196, 114, 199);">_a</b>, std::shared_ptr<<a><b style="color: rgb(69, 134, 69);">iNode</b>> <b style="color:orangered">_b</b>) { <br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%">
+                                                return std::stoi(<b style="color: rgb(196, 114, 199);">_a</b>-><b style="color: rgb(96, 96, 155);">getName()</b>) < std::stoi(<b style="color:orangered">_b</b>-><b style="color: rgb(96, 96, 155);">getName()</b>);<br>
+                                            </blockquote>
+                                        })<br>
+                                    </code>
+                                </div>
+                                We then sort the points by their <b style="color: rgb(96, 96, 155);">name</b>. This is why it was important to <b style="color: rgb(96, 96, 155);">name</b> them 0, 1, 2, 3 and so on.<br><br> 
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        for (auto& <b style="color: rgb(81, 185, 151);">point</b> : points)<br>
+                                        {<br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%">
+                                            if (<b style="color: rgb(81, 185, 151);">point</b>->hasTag(<b style="color: rgb(96, 96, 155);">getName()</b>))<br>
+                                            {<br>
+                                                <blockquote style="margin-top: 0%; margin-bottom: 0%">
+                                                    auto <b style="color: rgb(235, 213, 20);">pos</b> = <b style="color: rgb(81, 185, 151);">point</b>->getWorldPosition();<br>
+                                                    positions.push_back(<b style="color: rgb(235, 213, 20);">pos</b>);<br>
+                                                </blockquote>
+                                            }<br>
+                                            </blockquote>
+                                        }<br>
+                                    </code>
+                                </div>
+                                Lastly we go through all the points, grabbing the once that have the <b style="color: rgb(192, 56, 56);">tag</b> corresponding with the platfroms <b style="color: rgb(96, 96, 155);">name</b>. Saving only their position in the world to a vector. <br><br>
+
+                                Now a lot of you will already see a few problems with this and I think there are 2 major ones. <br>
+                                1. Renaming a platform will have you restaging all of the points to that platform.<br>
+                                2. Every platform is looking through every <b style="color: rgb(69, 134, 69);">node</b> once the game starts to find their points and sort them.<br><br>
+
+                                Both of these have fixes to them, let's do them in order.<br><br>
+
+                                Instead of using a <b style="color: rgb(192, 56, 56);">tag</b> to connect the point to the platform, having the point have some sort of weakptr to the platform would have been better. <br>
+                                Now could I have done that when this was a 2 week project and I had done a total of 4 months of c++ experience, 
+                                no but I recognize that this isn't a good way of doing this. <br><br>
+
+                                When it comes to every platform looking through every <b style="color: rgb(69, 134, 69);">node</b>, I first want to give the context that this engine used <b style="color: rgb(69, 134, 69);">nodes</b> for everything in the game world. <br>
+                                If it was in the world it was a <b style="color: rgb(69, 134, 69);">node</b>. So now every platform is checking every <b style="color: rgb(69, 134, 69);">node</b> once and every platform <b style="color: rgb(69, 134, 69);">node</b> twice.<br>
+                                This could have been kinda elevated by having a platform manager that simply goes over every <b style="color: rgb(69, 134, 69);">node</b> by itself and then delegates down to the platforms.<br><br>
+
+                                This was 1 out of the 2 problems with the platforms in entropy 1 the other one was more <b style="color:rgb(255, 233, 0);">*</b>mathematical<b style="color:rgb(255, 233, 0);">*</b> in nature.<br><br>
+
+                                I’m going with the base knowledge that everyone that reads this knows what a lerp is. <br>
+                                Now think of you have 2 objects that have the same speed on their lerp, ie the lerp is t value is going up at the same rate, but they have different distances to travel. <br><br>
+
+                                Box <b style="color:rgb(238, 124, 48);">[A]</b> has a distance of 10 m. <br>
+                                Box <b style="color:rgb(8, 226, 226);">[B]</b> has a distance of 20 m. <br> <br>
+
+                                <div>
+                                    <div class="codeCase">
+                                        <div style="width: 94%;">
+                                            <div id ="ABoxBF" class="ABox">
+                                                <b style="color:rgb(238, 124, 48); font-size: 30px; text-align: center;">[A]</b>
+                                            </div>
+                                            <div id ="BBoxBF" class="BBox">
+                                                <b style="color:rgb(8, 226, 226); font-size: 30px; text-align: center;">[B]</b>
+                                            </div>
                                         </div>
                                     </div>
-                                -->
+                                    <div class="slidecontainer">
+                                        <input type="range" min="0" max="100" value="0" class="slider" id="SlideBF">
+                                    </div>
+                                </div>
+                                
+                                As we lerp, once the lerp hits 0.5 (50%) <b style="color:rgb(238, 124, 48);">[A]</b> has reached 5 m but <b style="color:rgb(8, 226, 226);">[B]</b> has gotten all of 10 m. <br>
+                                This is because we are not compensating for the difference in distance between where they are going. <br>
+                                So how do we compensate for this while keeping the same speed on the boxes. <br>
+                                We don't want <b style="color:rgb(8, 226, 226);">[B]</b> to be slower than <b style="color:rgb(238, 124, 48);">[A]</b>.<br>
+                                Well we do so with some simple math.<br><br>
 
-                                <b> The Mathimatical problem </b><br>
-                                Say we have 2 boxes <b style="color:rgb(255, 115, 0)">[A]</b> and <b style="color:rgb(137, 164, 240);">[B]</b>, they are both lerping over a distance. Box <b style="color:rgb(255, 115, 0)">[A]</b> has the distance of 10m while box <b style="color:rgb(137, 164, 240);">[B]</b> has a distance of 20m. <br>
-                                Lerping from start to end on both boxes with the same speed will have this effect: when lerp is 0.5 (50%) done <b style="color:rgb(137, 164, 240);">[B]</b> will be 10m and <b style="color:rgb(255, 115, 0)">[A]</b> will be ... 5m.<br>
-                                Even thougth they are lerping at the same speed they are travling a differnt distance 50% of 20m is 10m and 50% of 10m is 5m.<br>
-                                So we needed to fix this cus otherwise diffrent platfroms would have differnt speed which wouldnt feel great.<br>
-                                How did we do this? Well <b style="color:rgb(255, 233, 0);">*</b>math<b style="color:rgb(255, 233, 0);">*</b>  of course. <br>
                                 <div class="codeCase">
                                     <code class="CPPCode">
-		                                platform.<b style="color:rgb(74, 207, 185)">m_time</b> = std::clamp(platform.<b style="color:rgb(74, 207, 185)">m_time</b> += (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
+                                        platform.<b style="color: mediumpurple;">m_time</b> = std::clamp(platform.m_time += (std::clamp(<b style="color: cornflowerblue;">_delta_time</b>, 0.0f, 1.0f) * time_flow * platform.<b style="color: rgb(240, 131, 54);">m_point_travel_time</b>) / platform.<b style="color: rgb(233, 74, 74);">diff</b>, 0.0f, 1.0f);
                                     </code>
                                 </div>
-                                This line of code here is what is handling time for the platfroms. Let me break it down for you.<br>
-                                "<b style="color:rgb(74, 207, 185); font-family: monospace;" >m_time</b>" is the current time of this platform.<br>
-                                "<b style="color: rgb(156, 123, 182); font-family: monospace;">time_flow</b>" is either 1, -1 depending on if the platform is "active", active means that the player has told it to start moving.<br>
-                                 1 means for it to go forward in the lerp, start -> end. -1 means going backwards in the lerp, end -> start.<br>
-                                "<b style="color: rgb(175, 63, 119); font-family: monospace;">m_point_travel_time</b>" is the time it takes for the platform to travel, in effet is speed <br>
-                                "<b style="color: rgb(114, 182, 94); font-family: monospace;">diff</b>" is just the length difference between the points its traveling between <br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        (std::clamp(<b style="color:rgb(214, 128, 97)">_delta_time</b>, 0.0f, 1.0f) * <b style="color: rgb(156, 123, 182);">time_flow</b> * platform.<b style="color: rgb(175, 63, 119);">m_point_travel_time</b>)
-                                    </code>
-                                </div>
-                                This looks werid but we do this becouse the engine we worked in doesnt clamp <b style="color:rgb(214, 128, 97)">_delta_time</b> by defult so tabing in and out would get you a ridiculous number, so we compensate for it by clamping the <b style="color:rgb(214, 128, 97)">_delta_time</b> value. <br>
-                                Then we multiply this by both the speed and the time flow of the platfrom. This gets us out a time value that compensates for diraction of travel and framerate.
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        std::clamp( platform.m_time += (*Previus Code*) / platform.<b style="color: rgb(114, 182, 94);">diff</b>, 0.0f, 1.0f);
-                                    </code>
-                                </div>
-                                After we done the time value but before we add it to our previus time we divide this value by the <b style="color: rgb(114, 182, 94); font-family: monospace;">diff</b> to acount for the space between the points.<br>
-                                We add all of this onto the time, incrmently increasting it towards 1 or 0 deppending on <b style="color: rgb(156, 123, 182); font-family: monospace;">time_flow</b>.<br>
-                                Lastly we clamp the value to make sure that we do not go above 1 or bellow 0.<br><br>
 
-                                This is how we get a time for the lerp that will be moving at the same speed nomatter the distance it has to travel.
+                                Now this is a lot so let's simplify it down a bit<br><br>
 
-                                <!-- add another box problem here but with the soultion -->
-                                 <br>
-                                 <br>
-                                 <b> The Feature Problem </b> <br>
-                                 As I said before the engine we used for this didnt have splines but we manged to come up with a creative soultion.<br>
-                                <div class="codeCase">
+                                 <div class="codeCase">
                                     <code class="CPPCode">
-                                        auto searchForPlatformsPoints = [](const std::shared_ptr<iNode> _node) {<br>
-	                                    	if (_node->hasTag("<b style="color: rgb(177, 77, 77);">is_point</b>"))<br>
-	                                    	{<br>
-	                                    		_node->setHidden(true);<br>
-	                                    		return true;<br>
-	                                    	}<br>
-	                                    	return false;<br>
-	                                    	};<br><br>
-                                            
-	                                    auto points = _scene.lock()->searchAllNodes(searchForPlatformsPoints);<br>
+                                        <b style="color: mediumpurple;">time</b> = (<b style="color: cornflowerblue;">delta_time</b> * <b style="color: rgb(240, 131, 54);">platform_speed</b>) / <b style="color: rgb(233, 74, 74);">the_length_between_a_point_pair</b>
                                     </code>
                                 </div>
-                                First we search all the nodes in the scene if they have the tag "<b style="color: rgb(177, 77, 77);">is_point</b>". If the node has his tag we set it to hidden and add it to an array of points. <br>
-                                We sort this array using the points name, the points are named from 0 -> X, X being how every many points there were. <br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        for (auto& point : points) <br>
-	                                        {<br>
-	                                        	if (point->hasTag(getName()))<br>
-	                                        	{<br>
-	                                        		auto pos = point->getWorldPosition();<br>
-	                                        		<b style="color: hotpink;">positions</b>.push_back(pos);<br>
-	                                        	}<br>
-	                                        }
-                                    </code>
+                                All we really need to do is divide by the length of the distance we are traveling. <br><br>
+
+                                <div>
+                                    <div class="codeCase">
+                                        <div style="width: 94%;">
+                                            <div id ="ABoxAF" class="ABox">
+                                                <b style="color:rgb(238, 124, 48); font-size: 30px; text-align: center;">[A]</b>
+                                            </div>
+                                            <div id ="BBoxAF" class="BBox">
+                                                <b style="color:rgb(8, 226, 226); font-size: 30px; text-align: center;">[B]</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slidecontainer">
+                                        <input type="range" min="0" max="100" value="0" class="slider" id="SliderAF">
+                                    </div>
                                 </div>
-                                Lasty we get all the points that have a tag that is the same as this platfroms name. Stroing their world positions in <b style="color: hotpink;">positions</b>, the platfrom will then use this vector of <b style="color: hotpink;">positions</b> to figure out where to travel to. <br> <br>
-                                This was how we got around the lack of splines.<br>
-                                <br>
+
+                                There is nothing for me to add here I just think this is cool. It also shows off how I solved a problem like this.<br>
+                                This will also help me when I made the platforms in entropy proper,<br><br>
+
                                 I cant give acces to the full project but I was allowed to share these filles, edited to not hit NDA but still
                                 <div style="display: flex; margin-top: 0px;">
                                     <div style="width: 100%; height: fit-content; display: flex; justify-content: center; margin-top: 50px;">

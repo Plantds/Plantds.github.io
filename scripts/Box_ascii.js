@@ -1,31 +1,24 @@
-function move(element, direction, distance=10, duration="0.1s") {
-   var elId = element.id;
-   if (!elId) { throw("Cannot move an element without an ID!"); }
-   var elStyleSheet = document.getElementById(elId + "-movement");
-   if (!elStyleSheet) {
-      elStyleSheet = document.createElement("style");
-      elStyleSheet.id = elId + "-movement";
-      document.head.appendChild(elStyleSheet);
-   }
-   var topOrLeft = (direction=="left" || direction=="right") ? "left" : "top";
-   if (direction=="up" || direction=="left") { distance *= -1; }
-   
-   var elStyle = window.getComputedStyle(element);
-   var value = elStyle.getPropertyValue(topOrLeft).replace("px", "");
-   var destination = (Number(value) + distance) + "px";
-   var oldLoc = [elStyle.getPropertyValue("left"), elStyle.getPropertyValue("top")];
-   var newLoc = (topOrLeft=="left") ? [destination, oldLoc[1]] : [oldLoc[0], destination];
-   elStyleSheet.innerHTML = elStyleSheet.innerHTML.replace(/\s+\#(.|\n)*?\}\s+\n/, "");
-   elStyleSheet.innerHTML += `
-      #` + elId + `.moved
-      {
-         transition: all ` + duration + ` linear;
-         -webkit-transition: all ` + duration + ` linear;
-         -moz-transition: all ` + duration + ` linear;
-         -o-transition: all ` + duration + ` linear;
-         top: ` + newLoc[1] + `;
-         left: ` + newLoc[0] + `;
-      }
-   `;
-   element.classList.add("moved");
+function lerp(posA, posB, time){
+   var pos;
+   pos = (posA - posB)*time;
+   return pos;
+}
+
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
+
+var sliderBF = document.getElementById("SlideBF");
+var ABoxBF = document.getElementById("ABoxBF");
+var BBoxBF = document.getElementById("BBoxBF");
+
+sliderBF.oninput = function moveBoxesBF(){
+   ABoxBF.style.left = lerp(50,0, (sliderBF.value/100)) + '%'; 
+   BBoxBF.style.left = lerp(100,0, (sliderBF.value/100)) + '%'; 
+}
+
+var sliderAF = document.getElementById("SliderAF");
+var ABoxAF = document.getElementById("ABoxAF");
+var BBoxAF = document.getElementById("BBoxAF");
+sliderAF.oninput = function moveBoxesAF(){
+   ABoxAF.style.left = lerp(50,0, clamp((sliderAF.value*2 / 100), 0, 1)) + '%'; 
+   BBoxAF.style.left = lerp(100 ,0,  clamp((sliderAF.value*2 / 100 / 2), 0, 1)) + '%'; 
 }
