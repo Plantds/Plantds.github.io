@@ -32,947 +32,599 @@
                     <div class="CardInfoContainer">
                          <div class="TextBox">
                             <div class="Text">
-                                So for the Movement in unity or MIU im going to go script by script function by function and you can see which script im talking about by the tittle that comes up.
-                                <br>
-                                like here it is "Player.cs"
-                            </div>
-                        </div>
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                Player.cs
-                            </div>
-                        </div>
-                        <div class="TextBox">
-                            <div class="Text">
-                                Veriables
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-		                                [Header("Miscellaneous")]<br>
-                                        [SerializeField] private PlayerCharacter playerCharacter;<br>
-                                        [SerializeField] private cutAndParry cutAndParry;<br>
-                                        [SerializeField] private PlayerCamera playerCamera;<br>
-                                        [SerializeField] private CameraSpring cameraSpring;<br>
-                                        [SerializeField] private cameraLean cameraLean;<br><br>
-                                                                            
-                                        [Header("Input")]<br>
-                                        [SerializeField] private bool toggleCrouchSlide = false;<br>
-                                        [SerializeField] private bool toggleRun = false;<br><br>
-                                                                            
-                                        private IA_AdvancedPlayer _inputActions;<br>
-                                    </code>
-                                </div>
-                                Everything under miscellaneous doesnt really matter that much they just reference the other scripts that make up the player character.<br>
-                                I am usuing the Input Actions or IA that unity has for this project. They are very simular to unreals input actions.<br><br>
-                                
-                                <b>Start</b> just Initializes a bunch of these codes or makes new once so im gonna skip it.<br><br>
-                                
-                                <b> Update </b> how ever does do a few things so lets look at that.<br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-		                                    void Update()<br>
-                                            {<br>
-                                                var <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> = _inputActions.player;<br>
-                                                var deltaTime = Time.deltaTime;<br><br>
-                                            
-                                                // get camera input and updates its rotation<br>
-                                                var cameraInput = new CameraInput { lookVec = <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.look.ReadValue<Vector2>() };<br>
-                                                playerCamera.UpdateRotation(cameraInput);<br><br>
-                                                
-                                    </code>
-                                </div>
-                                First we store the players <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> this frame and the delta time.<br>
-                                Then we use the <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b> make a new CameraInput with its look vector being equal to the <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.look value.<br>
-                                After that we call a custom function in the camera to update its rotation using the cameraInput.<br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                                // get character input and update it<br>
-                                                var characterInput = new CharacterInput<br>
-                                                {<br>
-                                                    // movement input<br>
-                                                    Rotation = playerCamera.transform.rotation,<br>
-                                                    Move = input.WASD.ReadValue<Vector2>(),<br>
-                                                    Jump = input.jump.WasPressedThisFrame(),<br>
-                                                    JumpSustain = input.jump.IsPressed(),<br>
-                                                    Crouch = toggleCrouchSlide ? (input.crouch_slide.WasPressedThisFrame() ? CrouchInput.toggle : CrouchInput.None) : (input.crouch_slide.IsPressed() ? CrouchInput.Crouch : CrouchInput.Uncrouch),<br>
-                                                    Run = toggleRun ? (input.run.WasPressedThisFrame() ? RunInput.toggle : RunInput.None) : (input.run.IsPressed() ? RunInput.Run : RunInput.Unrun),<br>
-                                                    Dash = input.dash.WasPressedThisFrame(),<br>
-                                                };<br><br>
-                                            
-                                                var weaponInput = new weaponInput<br>
-                                                {<br>
-                                                    // Gameplay input<br>
-                                                    Cut = input.cut.WasPressedThisFrame(),<br>
-                                                    Parry = input.parry.WasPerformedThisFrame(),<br>
-                                                    Sheath = input.Sheath.WasPerformedThisFrame()<br>
-                                                };<br><br>
-                                    </code>
-                                </div>
-                                
-                                Here we make a new characterInput struct and fill in with information based of if an <b style="color: rgb(175, 68, 68); font-family: monospace;">input</b>.veriable was pressed this frame or not. <br>
-                                Their are some expections to this, like rotation is just grabed from the camera or JumpSustain is just shaking if was pressed or not.<br>
-                                The one line I want to look closer at is the Run/Crouch inputs, see they are both togglable so they need some extra lines.<br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                                    Crouch = toggleCrouchSlide ? (input.crouch_slide.WasPressedThisFrame() ? CrouchInput.toggle : CrouchInput.None) : (input.crouch_slide.IsPressed() ? CrouchInput.Crouch : CrouchInput.Uncrouch),<br>
-                                    </code>
-                                </div>
-                                This statement is just trying to get what value the crouch should be. We use the "?" operator multiple times to get the answer we want.<br>
-                                the "?" operatror is an if statement for a variable basicly; (statement) ? true : false; if statement is true return the left most value other wise return the right most.<br>
-                                The first ? operator checks if we have crouch toggled or not. The secound ? operator just turns the crouch on or off.<br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                                playerCharacter.UpdateInput(characterInput);<br>
-                                                playerCharacter.UpdateBody(deltaTime);<br><br>
-                                            
-                                                cutAndParry.UpdateWeaponInput(weaponInput);<br><br>
-                                            
-                                        #if UNITY_EDITOR<br>
-                                                if (Keyboard.current.tKey.wasPressedThisFrame)<br>
-                                                {<br>
-                                                    var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);<br>
-                                                    if (Physics.Raycast(ray, out var hit))<br>
-                                                    {<br>
-                                                        Teleport(hit.point);<br>
-                                                    }<br>
-                                                }<br>
-                                        #endif<br>
-                                            }<br>
-                                    </code>
-                                </div>
-                                We call the player character to update its inputs and then its body, a function we will see later.<br>
-                                After that we do the weapon inputs but also have a debug key that allows us to Teleport to where a ray hits in the scene.<br>
-                                This is very usefull becouse of how our terrain looks in the game.<br><br>
-
-                                <b>LateUpdate</b> is what comes next.
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                     void LateUpdate()<br>
-                                    {<br>
-                                        var deltaTime = Time.deltaTime;<br>
-                                        var cameraTarget = playerCharacter.getCameraTarget();<br>
-                                        var state = playerCharacter.GetState();<br><br>
-                                    
-                                        playerCamera.UpdatePosition(cameraTarget);<br>
-                                        cameraSpring.UpdateSpring(deltaTime, cameraTarget.up);<br>
-                                        cameraLean.UpdateSpring(deltaTime, state.Stance is Stance.sliding, state.Acceleration, cameraTarget.up);<br>
-                                    }<br>
-                                    </code>
-                                </div>
-                                in here we just call a bunch of function inside other scripts that make up the player. Here is where we update the camera, we do this here so that we know that all the movement callculation have been done this frame and now can just move the camera smoothly.<br>
-                            </div>
-                        </div>
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                PlayerCharacter.cs
+                                Right so the player is built up like this in unity; <br>
+                                    <div class="codeCase">
+                                        <code class="CPPCode">
+                                            <div class="codeCase" style="width: 50%; justify-self: center; margin-bottom: 0%;">
+                                                <code class="CPPCode">
+                                                    <p style="margin: 0%; text-align: center; font-size: 26px;">
+                                                        Player
+                                                    </p>
+                                                </code>
+                                            </div>
+                                            <div style="display: inline-block; display: flex; justify-content: center; margin-top: 0%;">
+                                                <p style="margin: 0%; font-size: 30px; text-align: center; width: 50%;">
+                                                    ↓ 
+                                                </p>
+                                                <p style="margin: 0%; font-size: 30px; text-align: center; width: 50%;">
+                                                    ↓
+                                                </p>
+                                            </div>
+                                            <div style="display: inline-block; display: flex; justify-content: center; margin-top: 0%; margin-bottom: 0%;">
+                                                <div class="codeCase" style="width: 50%; margin-top: 0%; margin-bottom: 0%;">
+                                                    <code class="CPPCode">
+                                                        <p style="margin: 0%; text-align: center;">
+                                                            Character
+                                                        </p>
+                                                        <div style="margin: 0%; display: flex; justify-content: center;">
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                ↓          
+                                                            </p>
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                ↓
+                                                            </p>
+                                                        </div>
+                                                        <div style="margin: 0%; display: flex; justify-content: center;">
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                Root<br>
+                                                                ↓<br>
+                                                                Capsule   
+                                                            </p>
+                                                            <p style="margin: 0%; text-align: center; width: 50%;">
+                                                                Camera Target<br>
+                                                            </p>
+                                                        </div>
+                                                    </code>
+                                                 </div>
+                                                 <div class="codeCase" style="width: 50%; margin-top: 0%; margin-bottom: 0%;">
+                                                    <code class="CPPCode">
+                                                         <p style="margin: 0%; text-align: center;">
+                                                            Camera <br>
+                                                            ↓ <br>
+                                                            Spring
+                                                        </p>
+                                                         <div style="margin: 0%; display: flex; justify-content: center;">
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                ↓          
+                                                            </p>
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                ↓
+                                                            </p>
+                                                        </div>
+                                                        <div style="margin: 0%; display: flex; justify-content: center;">
+                                                            <p style="margin: 0%; width: 50%; text-align: center;">
+                                                                 CinemachineCamera      
+                                                            </p>
+                                                            <p style="margin: 0%; text-align: center; width: 50%;">
+                                                                attackBoxCenter
+                                                            </p>
+                                                        </div>
+                                                    </code>
+                                                 </div>
+                                            </div>
+                                        </code>
+                                   </div>
+                                This is how it is structured. <br>
+                                Let's begin with the camera. <br>
                             </div>
                         </div>
                         <div class="TextBox">
+                            <div style="justify-content: center; display: flex;">
+                                <div class="MinorTitle">
+                                    Camera
+                                </div>
+                            </div>
                             <div class="Text">
-                                The actual meat of the character movement happens in this script. Think of player.cs as a manger calling all the other scripts as needed.<br>
-                                Let's being with<b> UpdateInput</b>, now this function updates a bunch of veriabels so I wont show all of it but I wanna show a part of it that I really find cool <br>
                                 <div class="codeCase">
-                                    <code class="CPPCode">
-                                            bool wasReqestingCrouch = <b style="color: darkcyan;"> _requestedCrouch</b>;<br>
-                                            <b style="color: darkcyan;"> _requestedCrouch</b> = input.Crouch switch<br>
-                                            {<br>
-                                                CrouchInput.toggle => !<b style="color: darkcyan;"> _requestedCrouch</b>,<br>
-                                                CrouchInput.None => <b style="color: darkcyan;"> _requestedCrouch</b>,<br><br>
-                                            
-                                                CrouchInput.Crouch => true,<br>
-                                                CrouchInput.Uncrouch => false,<br>
-                                                _ => <b style="color: darkcyan;"> _requestedCrouch</b><br>
-                                            };<br>
-                                    </code>
+                                   <code class="CPPCode">
+                                        <p style="margin: 0%; text-align: center;">
+                                           Camera → <b style="color: rgb(142, 142, 226);">PlayerCamera.cs</b> <br> 
+                                           ↓ <br>
+                                           Spring → <b style="color: rgb(142, 226, 167);">CameraSpring.cs</b> & <b style="color: rgb(226, 142, 142);">cameraLean.cs</b>
+                                       </p>
+                                        <div style="margin: 0%; display: flex; justify-content: center;">
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                               ↓          
+                                           </p>
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                               ↓
+                                           </p>
+                                       </div>
+                                       <div style="margin: 0%; display: flex; justify-content: center;">
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                                CinemachineCamera <br>
+                                                 // The actual camera 
+                                           </p>
+                                           <p style="margin: 0%; text-align: center; width: 50%;">
+                                               attackBoxCenter <br>
+                                            // This doesn't have a script but is used by another script
+                                           </p>
+                                       </div>
+                                   </code>
                                 </div>
-                                This looks odd but this is a simple swtich statement but when I was making this I had no idea you could use a switch like this.<br>
-                                Depending on what CrouchInput is it will return true or false but this also allows us to make toggle crouch by just fliping the <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b>.<br>
-                                the _ => <b style="color: darkcyan; font-family: monospace;"> _requestedCrouch</b> looks really werid but is just the defualt case. <br><br>
+                                Let's go to <b style="color: rgb(142, 142, 226);">PlayerCamera.cs</b> first.
+                                This is taking care of 2 things mainly; <br>
+                                1. Cameras Position.<br>
+                                2. Cameras Rotation.<br>
+                                <div class="codeCase">
+                                   <code class="CPPCode">
+                                        [SerializeField] private float sensitvity = 0.1f;<br>
+                                        private Vector3 _eulerAngles;<br>
+                                        public void <b style="color:rgb(68, 185, 68);">Initialize</b>(Transform <b style="color:rgb(218, 122, 218)">target</b>)<br>
+                                        {
+                                            <blockquote style="margin-top: 0px; margin-bottom: 0px;">
+                                                transform.position = <b style="color:rgb(218, 122, 218)">target</b>.position;<br>
+                                                transform.rotation = <b style="color:rgb(218, 122, 218)">target</b>.rotation;<br><br>
 
-                                <b> UpdateBody </b> from earlier show up here again and it looks like this 
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                            public void UpdateBody(float deltaTime)<br>
-                                            {<br>
-                                                float currentHeight = motor.Capsule.height;<br>
-                                                float normalizedHeight = currentHeight / standingHight;<br><br>
-                                            
-                                                float cameraTargetHeight = currentHeight * (_state.Stance is Stance.Stand ? standingCameraHeightTarget : crouhCameraHeightTarget);<br>
-                                                Vector3 rootTragetScale = new Vector3(1.0f, normalizedHeight, 1.0f);<br><br>
-                                            
-                                                cameraTarget.localPosition = Vector3.Lerp(<br>
-                                                    a: cameraTarget.localPosition,<br>
-                                                    b: new Vector3(0.0f, cameraTargetHeight, 0.0f),<br>
-                                                    t: 1.0f - Mathf.Exp(-crouchHeightResponse * deltaTime));<br><br>
-                                            
-                                                root.localScale = Vector3.Lerp(<br>
-                                                    a: root.localScale,<br>
-                                                    b: rootTragetScale,<br>
-                                                    t: 1.0f - Mathf.Exp(-crouchHeightResponse * deltaTime));<br>
-                                            }<br>
-                                    </code>
-                                </div>
-                                This updates the player hight and its camera postion but over time using a lerp.<br>
-                                This create a smooth up and down while crouching.<br>
-                                <div class="imagecontrainer">
-                                    <div class="Imgae" style="max-width: 1000px;">
-                                        <video style="width: 100%; height: 100%;" controls>
-                                            <source src="https://github.com/Plantds/Plantds.github.io/blob/main/pages/MIU/MIU_Vid/crouchUncrouch.mp4?raw=true" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <br>
-                                <br>
-                                Now lets look at the BeforeCharacterUpdates function, this on is called before we update the players movement. So this happens before we apply anything like position and rotation.<br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                    public void BeforeCharacterUpdate(float deltaTime)<br>
-                                    {<br>
-                                        _tempState = _state;<br><br>
-                                    
-                                        if (_requestedRun && _state.Stance is Stance.Stand && !_requestedCrouch)<br>
-                                        {<br>
-                                            _state.Stance = Stance.Running;<br>
+                                                transform.eulerAngles = _eulerAngles = <b style="color:rgb(218, 122, 218)">target</b>.eulerAngles;<br>
+                                            </blockquote>
                                         }<br><br>
                                     
-                                        if (_requestedCrouch && (_state.Stance is Stance.Stand || _state.Stance is Stance.Running))<br>
+                                        public void UpdateRotation(<b style="color: greenyellow;">CameraInput</b> input)<br>
                                         {<br>
-                                            _state.Stance = Stance.Crouch;<br>
-                                            motor.SetCapsuleDimensions(<br>
-                                                radius: motor.Capsule.radius,<br>
-                                                height: crocuhHight,<br>
-                                                yOffset: crocuhHight * 0.5f<br>
-                                            );<br><br>
-                                        
-                                            root.localPosition = new Vector3(0.0f, 0.5f, 0.0f);<br>
-                                        }<br>
-                                    }<br>
-                                    </code>
-                                </div>
-                                This is just setting up some states that can be called from heldown buttons, so both runing and crouching comes into play here.<br>
-                                AfterCharacterUpdate does basicly the same so im not going to show it.<br><br>
-
-                                So now for the big part <b style="color:rgb(255, 233, 0);">*</b> <b> UpdateVelocity </b> <b style="color:rgb(255, 233, 0);">*</b>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                   public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)<br>
-                                    {<br>
-                                     _state.Acceleration = Vector3.zero;<br>
-                                     Vector3 <b style="color: red; font-family: monospace;">groundedMovement</b> = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(direction: _requestedmovement, surfaceNormal: motor.GroundingStatus.GroundNormal) * _requestedmovement.magnitude;<br>
-                                     bool moving = <b style="color: red; font-family: monospace;">groundedMovement</b>.sqrMagnitude > 0;<br>
-                                     if(_state.Stance is Stance.Wallruning) _timeSinceUngrounded = 0.0f;<br>
-                                     if (motor.GroundingStatus.IsStableOnGround)<br>
-                                     {<br>
-                                         _timeSinceUngrounded = 0.0f;<br>
-                                         _ungrounedDueToJump = false;<br>
-                                    </code>
-                                </div>
-                                
-                                First we do some set up, we clear Acceleration and set it to 0, we get the grounded movements direaction by calling the function <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b>.<br>
-                                This function Crosses the direction with the characters up and then takes the resulting vector and crosses that with surfaceNormal. Returning this vecotr normalized for us to use. <br>
-                                <br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                    bool running = <b style="color: cadetblue;">_state</b>.Stance is Stance.Running;<br>
-                                    var shouldSlideStart = currentVelocity.magnitude > slideStartFreshold;<br>
-                                    var crouching = <b style="color: cadetblue;">_state</b>.Stance is Stance.Crouch;<br>
-                                    var wasStanding = <b style="color: rgb(209, 206, 102);">_lastState</b>.Stance is Stance.Stand;<br>
-                                    var wasRuning = <b style="color: rgb(209, 206, 102);">_lastState</b>.Stance is Stance.Running;<br>
-                                    var wasInAir = !<b style="color: rgb(209, 206, 102);">_lastState</b>.Grounded;<br>
-                                    </code>
-                                </div>
-                                Here we save a bunch of veriabels for later. Almost all of these have something to do with the <b style="color: cadetblue; font-family: monospace;">_state</b> or <b style="color: rgb(209, 206, 102); font-family: monospace;">_lastState</b> veriables which just a saved copy of the enum that saves the players stance, ie crouching, running, wallruning. <br>
-                                <br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                    // start slide<br>
-                                    if (moving && crouching && shouldSlideStart && (wasStanding || wasInAir || wasRuning))<br>
-                                    {<br>
-                                        _state.Stance = Stance.sliding;<br><br>
-                                    
-                                        if (wasInAir)<br>
-                                        {<br>
-                                            Vector3 groundNormal = motor.GroundingStatus.GroundNormal;<br>
-                                            Vector3 tangent = Vector3.ProjectOnPlane(<b style="color: rgb(75, 160, 149);">currentVelocity</b>, groundNormal);<br><br>
-                                        
-                                            // Keep tangential (momentum along slope), discard into-ground velocity<br>
-                                            if (tangent.sqrMagnitude > 0.001f)<br>
-                                                <b style="color: rgb(75, 160, 149);">currentVelocity</b> = tangent.normalized * <b style="color: rgb(75, 160, 149);">currentVelocity</b>.magnitude;<br>
+                                            <blockquote style="margin-top: 0px; margin-bottom: 0px;">
+                                                _eulerAngles += new Vector3(-input.lookVec.y, input.lookVec.x) * sensitvity;<br>
+                                                _eulerAngles.x = Mathf.Clamp(_eulerAngles.x, -89.0f, 89.0f);<br>
+                                                transform.eulerAngles = _eulerAngles;<br>
+                                            </blockquote>
                                         }<br><br>
                                     
-                                        float <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> = slideStartSpeed;<br>
-                                        if (!<b style="color: rgb(209, 206, 102);">_lastState</b>.Grounded && !_requestedCrouchInAir)<br>
+                                        public void UpdatePosition(Transform <b style="color:rgb(218, 122, 218)">target</b>)<br>
                                         {<br>
-                                            <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> = 0.0f;<br>
-                                            _requestedCrouchInAir = false;<br>
+                                            <blockquote style="margin-top: 0px; margin-bottom: 0px;">
+                                                transform.position = <b style="color:rgb(218, 122, 218)">target</b>.position;<br>
+                                            </blockquote>
                                         }<br>
-                                        float <b style="color:crimson; font-family: monospace;"> slideSpeed</b> = Mathf.Max(<b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>, <b style="color: rgb(75, 160, 149);">currentVelocity</b>.magnitude);<br>
-                                        <b style="color: rgb(75, 160, 149);">currentVelocity</b> = motor.<b style="color:rgb(116, 43, 165);">GetDirectionTangentToSurface</b>(<br>
-                                            direction: <b style="color: rgb(75, 160, 149);">currentVelocity</b>,<br>
-                                            surfaceNormal: motor.GroundingStatus.GroundNormal) * <b style="color:crimson; font-family: monospace;"> slideSpeed</b>;<br>
-                                    
-                                    }<br>
-                                    </code>
+                                   </code>
                                 </div>
-                                Here we have the start to <b> Slide </b>. First we just do a check to see if we can slide or not.<br>
-                                If we can slide then we set the stance to slide.<br>
-                                Then we check if we are in were in the air. If we were then we get the ground normal by using the KinematicCharacterMotor.<br>
-                                We project our current velocity onto this groundNormal. We do this to get a perallel vector to the plane we sliding on.<br>
-                                if the tangent is great enough we set the <b style="color: rgb(75, 160, 149);font-family: monospace;">currentVelocity</b>
-                                to be equal to tangent.normalized * <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b>.magnitude. This directs our movementom along the normal of the serfuce we are standing on.<br><br>
-                                
-                                After that we make a float called  <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>. This float will effect the <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b> later
-                                but we make this temperary verstion so we can change it as needed. <br>
-                                So we run a check to see if our <b style="color: rgb(209, 206, 102); font-family: monospace;">_lastState</b> wasnt grounded and _requestedCrouchInAir is false then we set the <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>
-                                to be 0 and flip the _requestedCrouchInAir to be false. This effectevly tells the later code not to use the <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b>.<br>
-                                <br>
-                                After that check we now set up another veriable <b style="color:crimson; font-family: monospace;"> slideSpeed</b>, is initiale value being equal to either <b style="color: rgb(195, 164, 207); font-family: monospace;">effectiveSlideStartSpeed</b> or 
-                                <b style="color: rgb(75, 160, 149); font-family: monospace;">currentVelocity</b>.magnitude depending on which is higher in value.<br>
-                                We use the <b style="color:rgb(116, 43, 165); font-family: monospace;">GetDirectionTangentToSurface</b> from before here again. Multiplying ther resulting vector with <b style="color:crimson; font-family: monospace;"> slideSpeed</b>. <br>
-                                Then we are done with slide. <br><br>
-
+                                It is a fairly small script. <br>
+                                But look at it with me.<br>
+                                <b style="color:rgb(68, 185, 68);">Initialize</b>, is handling just setting the camera where it should be and with what rotation it should have. <br>
+                                It takes a <b style="color:rgb(218, 122, 218)">target</b> transform to do this. <br>
+                                Keep in mind the <b style="color:rgb(218, 122, 218)">target</b> as a thing.<br><br>
+                            
+                                UpdateRotation, is where we update the angles of the camera.<br>
+                                We rotate it based on a <b style="color: greenyellow;">CameraInput</b>.<br>
+                                <b style="color: greenyellow;">CameraInput</b>, is a struct that contains a Vector2.<br>
+                                You can probably surmise that this is getting information from the mouse and rotating accordingly.<br>
+                                We do clamp the X axis cus other wise you can do this<br><br>
+                            
+                                // GIF OFF THE PROBLEM<br><br>
+                            
+                                This is all that <b style="color: rgb(142, 142, 226);">PlayerCamera.cs</b> is.<br>
+                                So let's look at the next script; <b style="color:rgb(255, 233, 0);">*</b><b style="color: rgb(142, 226, 167);">CameraSpring.cs</b><b style="color:rgb(255, 233, 0);">*</b><br>
+                                Now remember the structure.<br>
+                                The camera, like the actual camera, in this case called CinemachineCamera, sits on this spring that hosts this script and the next one we will talk about. <br>
                                 <div class="codeCase">
-                                    <code class="CPPCode">
-                                    if (_state.Stance is Stance.Stand or Stance.Crouch or Stance.Running)<br>
-                                    {<br>
-                                        float speed = _state.Stance switch<br>
-                                        {<br>
-                                            Stance.Stand => walkSpeed,<br>
-                                            Stance.Crouch => crouchSpeed,<br>
-                                            Stance.Running => runSpeed,<br>
-                                            _ => walkSpeed<br>
-                                        };<br>
-                                        float response = _state.Stance switch<br>
-                                        {<br>
-                                            Stance.Stand => walkResponse,<br>
-                                            Stance.Crouch => crouchResponse,<br>
-                                            Stance.Running => runResponse,<br>
-                                            _ => walkResponse<br>
-                                        };<br><br>
-                                    
-                                        if (!_requestedDash)<br>
-                                        {<br>
-                                            Vector3 tragetVelocity = groundedMovement * speed;<br>
-                                            Vector3 moveVelocity = Vector3.Lerp(<br>
-                                                a: currentVelocity,<br>
-                                                b: tragetVelocity,<br>
-                                                t: 1.0f - Mathf.Exp(-response * deltaTime)<br>
-                                            );<br>
-                                            _state.Acceleration = moveVelocity - currentVelocity;<br>
-                                            currentVelocity = moveVelocity;<br>
-                                        }<br>
-                                    }<br>
-                                    </code>
-                                </div>
-
-                                if the player is currently standing, crouching or running while on the ground we get the players speed and response.<br>
-                                then if the player isnt requesting to dash we lerp up our velocity to be our target velocity usuing response to control how fast we will lerp there <br>
-                                Lastly we set our acceleration and velocity.<br><br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                     else<br>
-                                        {<br>
-                                            currentVelocity -= currentVelocity * (slideFriction * deltaTime);<br><br>
-                                        
-                                            Vector3 forceOnSlope = Vector3.ProjectOnPlane(<br>
-                                                vector: -motor.CharacterUp,<br>
-                                                planeNormal: motor.GroundingStatus.GroundNormal<br>
-                                            ) * slideGravity;<br><br>
-                                        
-                                            currentVelocity -= forceOnSlope * deltaTime;<br><br>
-                                        
-                                            float <b style="color: cadetblue; font-family: monospace;">currentSpeed</b> = currentVelocity.magnitude;<br>
-                                            Vector3 <b style="color: aqua; font-family: monospace;">targetVelocity</b> = <b style="color: red; font-family: monospace;">groundedMovement</b> * <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>;<br>
-                                            Vector3 <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> = currentVelocity;<br>
-                                            Vector3 <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> = (<b style="color: aqua; font-family: monospace;">targetVelocity</b> - <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>) * slideSteerAcceleration * deltaTime;<br>
-                                            <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> += <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b>;<br>
-                                            <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> = Vector3.ClampMagnitude(<b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>, <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>);<br><br>
-                                        
-                                            _state.Acceleration = (<b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> - currentVelocity) / deltaTime;<br>
-                                            currentVelocity = <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>;<br><br>
-                                        
-                                            if (currentVelocity.magnitude < slideEndSpeed) _state.Stance = Stance.Crouch;<br>
-                                        }<br>
-                                    }<br>
-                                    </code>
-                                </div>
-
-                                so if we arent in the standing, running or crouching state and we are still on the ground we assume the player is sliding.<br>
-                                We slowly shrink the players velocity down by the slideFriction.<br>
-                                after that we project the characters up vector onto the ground multiplying the result with slide gravity.<br>
-                                We subtract even more from the current velocity, now based on the force down towards the slope.<br>
-                                <br>
-                                Now we want the player to have some abilty to steer during the slide so we do that by first setting up some veriables; <b style="color: aqua; font-family: monospace;">targetVelocity</b>, <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> and <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b>.<br>
-                                <b style="color: aqua; font-family: monospace;">targetVelocity</b> being made up from the <b style="color: red; font-family: monospace;">groundedMovement</b> we made way eariler and the <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>. Getting us the velocity we want to get to.<br>
-                                <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> starts out as just the current velocity but gets updated more and more in this function. This works like and editable snapshot of the velocity veriable.<br>
-                                <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> is the difference between the velocity we want to be at and our current velocity multiplied with the acceleration we give to steer.<br>
-                                <br>
-                                Now that we have done all of this we now edit the <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> to later replace current velocity with this new one.<br>
-                                first we add  <b style="color: rgb(221, 135, 54); font-family: monospace;">steerForce</b> to <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>, then making sure to clamp the magnatude <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> so it cant go heigher then the <b style="color: cadetblue; font-family: monospace;">currentSpeed</b>.<br>
-                                <br>
-                                After that we make the acceleration to be equal to difference between <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b> and currentVelocity divade by deltaTime.<br>
-                                Then we make currentVelocity to be the same as <b style="color: rgb(146, 112, 173); font-family: monospace;">steerVelocity</b>.<br><br>
-
-                                Lastly we just check if we are to slow to be in slide or not. If we are we go to crouch stance.<br>
-                                <br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                             else if (_state.Stance is not Stance.Wallruning)<br>
-                                     // air <br>
-                                       _timeSinceUngrounded += deltaTime;<br>
-                                       if (_requestedmovement.sqrMagnitude > 0.0f)<br>
-                                       {<br>
-                                           Vector3 <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> = Vector3.ProjectOnPlane(<br>
-                                               vector: _requestedmovement,<br>
-                                               planeNormal: motor.CharacterUp) * _requestedmovement.magnitude;<br><br>
-
-                                           Vector3 <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> = Vector3.ProjectOnPlane(<br>
-                                               vector: currentVelocity,<br>
-                                               planeNormal: motor.CharacterUp);<br><br>
-
-                                           Vector3 <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> * airAcceleration * deltaTime;<br><br>
-
-                                           if (<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>.magnitude < airSpeed)<br>
-                                           {<br>
-                                               Vector3 targetPlanarVelocity = <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br><br>
-
-                                               targetPlanarVelocity = Vector3.ClampMagnitude(targetPlanarVelocity, airSpeed);<br><br>
-
-                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = targetPlanarVelocity - <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>;<br>
-                                           }<br>
-                                           else if (Vector3.Dot(<b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>, <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
-                                           {<br>
-                                               Vector3 constrainedMovementForce = Vector3.ProjectOnPlane(<br>
-                                                   vector: <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>,<br>
-                                                   planeNormal: <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b>.normalized<br>
-                                               );<br><br>
-
-                                               <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = constrainedMovementForce;<br>
-                                           }<br><br>
-
-                                           if (motor.GroundingStatus.FoundAnyGround)<br>
-                                           {<br>
-                                               if (Vector3.Dot(<b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>, currentVelocity + <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>) > 0.0f)<br>
-                                               {<br>
-                                                   Vector3 obstuctionNormal = Vector3.Cross(<br>
-                                                       motor.CharacterUp,<br>
-                                                       Vector3.Cross(<br>
-                                                           motor.CharacterUp,<br>
-                                                           motor.GroundingStatus.GroundNormal<br>
-                                                       )<br>
-                                                   ).normalized;<br><br>
-
-                                                   <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> = Vector3.ProjectOnPlane(<b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>, obstuctionNormal);<br>
-                                               }<br>
-                                           }<br><br>
-
-                                           currentVelocity += <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>;<br>
-                                       }<br>
-                                    </code>
-                                </div>
-                                
-                                Here we have a check is an else if on if we are grounded or not so this first line basically says "if we are not wallruning and are in the air"<br>
-                                First we update a float that keeps track of how long we have been off the ground.<br>
-                                the first if check we see here asked just if we are inputing anything right now. <br>
-                                if we are wanting to move then we create 3 veriables; <br>
-                                <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> out of the 3 veribales this one gets used only to make the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> veriable.
-                                With this veriable we are projecting the movement we want to do unto the character up vector and taking the prodouct of that and multiplying the movement we want to do magnatude. Basicly moving the movement input onto the vector. <br>
-                                <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> is the secound veriable and is also the secound most used. This is also a projection onto a plane but this time usuing the current velocity of the player.<br>
-                                <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> is the most used veriable and is made using <b style="color: rgb(112, 151, 173); font-family: monospace;">planarMovement</b> multipled with both airAcceleration and deltaTime. This gets us how much we are actually going to accelerate from our requested movement. <br>
-                                <br>
-                                Now that we have these veriabels we use the to calcualte how we should be moving in the air.<br>
-                                If our current speed in air is less then air speed we create a target velocity that is just the <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> and the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> combined.<br>
-                                We clamp this ones max speed to be air speed and then take this target air speed minus the <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> and making that the <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>.<br>
-                                This effectevly makes <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> the difference between our current velocity and our target velocity.<br><br>
-
-                                Now if during this update we find any ground bellow us, stable or not, we check if the dot prodoct of  <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> and <b style="color: rgb(86, 199, 124); font-family: monospace;">currentPlanarVelocity</b> plus <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>
-                                is a postive value.<br>
-                                After this check we do a cross product using another cross product. So inside of the first cross prodcut we cross the characters up vector with the grounds normal vector, taking the resulting vector and crossing that with the characters up.<br>
-                                We normalize all of that so can get a normal vector to project <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b> on to.<br><br>
-
-                                and after all of this we finnaly just add to our currentVelocity the resulting <b style="color: rgb(165, 76, 76); font-family: monospace;">movementForce</b>. Effectevly allowing us to move in the air.<br><br>
-                                
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                            float <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = gravity;<br><br>
-
-                                            float verticalSpeed = Vector3.Dot(currentVelocity, motor.CharacterUp);<br>
-                                            if (_requestedSustainJump && verticalSpeed > 0.0f) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> *= jumpSustainGravity;<br>
-                                            if (dashGravityTimer > 0.0f) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = 0.0f;<br>
-                                            if (_state.Stance is Stance.Wallruning) <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> = 0.0f;<br><br>
-
-                                            currentVelocity += motor.CharacterUp * <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> * deltaTime;<br><br>
-
-                                        }<br><br>
-
-                                        RaycastHit rightHit;<br>
-                                        RaycastHit leftHit;<br>
-                                        bool rightWall = Physics.Raycast(transform.position, motor.CharacterRight, out rightHit, wallStartDistance, wall);<br>
-                                        bool leftWall = Physics.Raycast(transform.position, -motor.CharacterRight, out leftHit, wallStartDistance, wall);<br>
-                                    </code>
-                                </div>
-
-                                Here we create a temperary gravity veriable repricenting <b style="color:rgb(255, 233, 0);">*</b>gravity<b style="color:rgb(255, 233, 0);">*</b>
-                                This will be used to add gravity to the player but changed deppending on what we want. <br><br>
-                                So after we have set <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> to be equall to the gravity veriable we create a verical speed veriable which is the dot product
-                                between our currentVelocity and the character up vector.<br>
-                                After this we check if we are requesting a sustained jump ie player is holding down the jump key and our verticalSpeed is a postive value.
-                                If all of this is true then we multiply <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> with the veriable jumpSustainGravity.<br>
-                                Then we do another check this time checkinh if dashGravityTimer is a postive value, this only being set to a positive value once youve dashed. If we have dashed then we set 
-                                <b style="color: rgb(145, 211, 231); font-family: monospace;">effectiveGravity</b> to be nothing.<br>
-                                We do the exact same thing if we are currently wallruning as well.<br>
-                                <br>
-                                After that we do checks left and right of the player to see if there is a wall there or not. This happening only if the player is in air and not already wallruning.<br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                    if (_requestedJump)<br>
-                                    {<br>
-                                        if (_state.Stance is not Stance.Wallruning)<br>
-                                        {<br>
-                                            bool grounded = motor.GroundingStatus.IsStableOnGround;<br>
-                                            bool canCoyoteJump = _timeSinceUngrounded < coyoteTime && !_ungrounedDueToJump;<br>
-                                            if (grounded || canCoyoteJump)<br>
-                                            {<br>
-                                                _requestedJump = false;<br>
-                                                _requestedCrouch = false;<br>
-                                                _requestedCrouchInAir = false;<br><br>
-                                            
-                                                motor.ForceUnground(time: 0.0f);<br>
-                                                _ungrounedDueToJump = true;<br><br>
-                                            
-                                                float currentVerticalSpeed = Vector3.Dot(currentVelocity, motor.CharacterUp);<br>
-                                                float targetVerticalSpeed = Mathf.Max(currentVerticalSpeed, jumpSpeed);<br><br>
-                                            
-                                                currentVelocity += motor.CharacterUp * (targetVerticalSpeed - currentVerticalSpeed);<br>
-                                            }<br>
-                                        }<br>
-                                    </code>
-                                </div>
-
-                                This is where we handel jumping if you are not currently walllruning. <br>
-                                In here we make sure that we are either grounded or that we can coyote jump. Coyote jump just means a bit of time efter leaving the ground where you can still jump. This allows players do not perfectly time their jumps every time they do jump.<br>
-                                If either of these are true then we jump. <br>
-                                We flips some veriables. Then we get our current vertical speed by doting our velocity onto the character up vector.<br>
-                                After that we just pick the larger option between our current vertical speed and the jump. The greater one of the two become our target.<br>
-                                Then we add to the velocity. Now see how I do target - currentVericalspeed. Due to this, we can get either very little of out jumpSpeed or nothing.<br>
-                                currentVerticalSpeed - currentVerticalSpeed = 0 so we wouldnt end up adding anything to the player if they are already travling really fast up wards.<br>
-                                <br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                    else if (_state.Stance is Stance.Wallruning)<br>
-                                    {<br>
-                                        bool canCoyoteJump = _timeSinceUngrounded < coyoteTime && !_ungrounedDueToJump;<br>
-                                        if (canCoyoteJump)<br>
-                                        {<br>
-                                            _wallrunColdownTimer = wallrunColdownTime;<br>
-                                            _requestedJump = false;<br><br>
-                                        
-                                            _ungrounedDueToJump = true;<br><br>
-                                        
-                                            Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal;<br>
-                                            Vector3 combinedDir = motor.CharacterUp + (wallNormal * 0.3f);<br><br>
-                                        
-                                            currentVelocity += combinedDir * jumpSpeed;<br>
-                                        }<br>
-                                    }<br>
-                                    </code>
-                                </div>
-                                But if we are wallruning we want to be able to jump as well but with a different target direction.<br>
-                                We do this by getting the wall normal and the characters up, combining them to get our disired direction.<br>
-                                This direction will be the one we use to actually jump.<br>
-                                <br>                                
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        else<br>
-                                        {<br>
-                                            bool canJumpLater = _timeSinceJumpRequest < coyoteTime;<br>
-                                            _requestedJump = canJumpLater;<br>
-                                            _timeSinceJumpRequest += deltaTime;<br>
-                                        }<br>
-                                    }<br>
-                                    </code>
-                                </div>
-                                
-                                This is just cayote jump stuff. If your time since you requested jump is less then coyote time then _requestedJump will be true else it will be false.<br>
-                                Then we just add to the _timeSinceJumpRequest so its actually incressing<br><br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                               if (_requestedDash && currentDashesLeft > 0)<br>
-                                        {<br>
-                                            if (_state.Stance is Stance.Wallruning)<br>
-                                            {<br>
-                                                _state.Stance = Stance.Dashing;<br>
-                                                _wallrunColdownTimer = wallrunColdownTime;<br>
-                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal; // normals can at time point towards the wall fuck<br><br>
-                                            
-                                                Vector3 comebinedDir = (wallNormal * 0.3f) + motor.CharacterForward.normalized;<br><br>
-                                            
-                                                currentVelocity = new Vector3(0.0f, currentVelocity.y, currentVelocity.z);<br><br>
-                                            
-                                                currentVelocity += comebinedDir * airDashSpeed;<br>
-                                            }<br>
-                                            else<br>
-                                            {<br>
-                                                _state.Stance = Stance.Dashing;<br>
-                                                Vector3 groundedForward = motor.GetDirectionTangentToSurface(direction: motor.CharacterForward, surfaceNormal: motor.GroundingStatus.GroundNormal);<br>
-                                                motor.ForceUnground(time: 0.0f);<br><br>
-                                            
-                                                float effectiveDashSpeed = motor.GroundingStatus.IsStableOnGround ? groundDashSpeed : airDashSpeed;<br><br>
-                                            
-                                                if (groundedMovement.magnitude > 0.0f) currentVelocity += groundedMovement * effectiveDashSpeed;<br>
-                                                else currentVelocity += groundedForward * effectiveDashSpeed;<br>
-                                            }<br><br>
-                                        
-                                            currentDashesLeft--;<br>
-                                            _requestedDash = false;<br>
-                                        }<br>
-                                        if (currentDashesLeft == 0) _requestedDash = false;<br>
-                                    </code>
-                                </div>
-                                Here is where we handle the <b style="color:rgb(255, 233, 0);">*</b>dash<b style="color:rgb(255, 233, 0);">*</b>. <br>
-                                The first check is simple if you have asked to dash and have dashes left then we start dashing. <br>
-                                Now their is 2 types of dashes in here. Either a wallrun dash or "normal" dash.<br><br>
-
-                                Lets start with the wallruning one.<br>
-                                first we change the stance. I admit we can move this line one row before and not have to repeat it again later but welp.<br>
-                                We rest the wallrun timer and get the wallrun normal.<br>
-                                Simular to the jump we make a combined dir but this is of that normal and the players forward.<br>
-                                We throw out the right and left momentum of the player setting it to 0. Then we add our dash speed to it <br><br>
-                                
-                                Now if we arent on no wall then we get a grounded forward usuing GetDirectionTangentToSurface() and force the player to no be grounded.<br>
-                                then we do a simple grounded check to get whihch dash speed we should be using.<br>
-                                Now we just dash either in the direction the player is moving or the direction the player is looking.<br><br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        // wallruning<br>
-                                        if (!motor.GroundingStatus.IsStableOnGround && _wallrunColdownTimer < 0.0f && _state.Stance is not Stance.Dashing && !_requestedJump && _isGettingMovementInput && (currentVelocity.sqrMagnitude > wallrunFrechold || _state.Stance is Stance.Running) && (rightWall || leftWall))<br>
-                                        {<br>
-                                            {// start wallrun<br>
-                                                _state.Stance = Stance.Wallruning;<br>
-                                                _ungrounedDueToJump = false;<br>
-                                                currentVelocity = new Vector3(currentVelocity.x, 0.0f, currentVelocity.z);<br>
-                                            }<br>
-                                            {// during wallrun<br>
-                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal;<br>
-                                                Vector3 wallForward = Vector3.Cross(wallNormal, motor.CharacterUp);<br><br>
-                                            
-                                                float chosenStartSpeed = Mathf.Max(wallrunStartSpeed, currentVelocity.magnitude);<br>
-                                                float effectiveWallrunSpeed = Mathf.Lerp(<br>
-                                                    a: chosenStartSpeed,<br>
-                                                    b: wallrunEndSpeed,<br>
-                                                    t: 1.0f - Mathf.Exp(-walkResponse * deltaTime));<br><br>
-                                            
-                                                Vector3 effectiveForward = (motor.CharacterForward - wallForward).magnitude > (motor.CharacterForward - -wallForward).magnitude ? -wallForward : wallForward;<br><br>
-                                            
-                                                Vector3 tragetVelocity = (effectiveForward + groundedMovement).normalized * effectiveWallrunSpeed;<br>
-                                                Vector3 moveVelocity = Vector3.Lerp( // not learping shit huh<br>
-                                                    a: currentVelocity,<br>
-                                                    b: tragetVelocity,<br>
-                                                    t: 1.0f - Mathf.Exp(-wallrunResponse * deltaTime)<br>
-                                                );<br>
-                                                _state.Acceleration = moveVelocity - currentVelocity;<br>
-                                                currentVelocity = moveVelocity;<br>
-                                            }<br>
-                                        }<br>
-                                        else if (_state.Stance is Stance.Wallruning && !rightWall && !leftWall || _state.Stance is Stance.Wallruning && !_isGettingMovementInput)<br>
-                                        {<br>
-                                            _wallrunColdownTimer = wallrunColdownTime;<br>
-                                            _state.Stance = Stance.Stand;<br>
-                                        }<br><br>
-                                        
-                                    }<br>
-                                    </code>
-                                </div>
-
-                                And at last we have wallruning. <br>
-                                we have quite the long if for if we should start the run or not. <br>
-                                1. The player shouldnt be grounded<br>
-                                2. The cooldown for being on a wall should be less then 0 <br>
-                                3. We can not be dashing <br>
-                                4. We can not be requesting <br>
-                                5. We are giving a movement input <br>
-                                6. We either hit the velocity minimum or we are running<br>
-                                7. there is either a wall left or right of us<br>
-                                <br>
-                                Like I said a lot needs to be true for us to do this.<br>
-                                Now wehn we enter a wall run we flip the state, we set the bool _ungrounedDueToJump to false and remeove the up  velocity from out current velocity<br>
-                                After that we get the wallnormal and use it to get the wall forward by crossing it with our up vector.<br>
-                                Then we pick the start speed between either our current velocity or wallrunStartSpeed, depending on which is bigger <br>
-                                After we lerp this speed down over time using a lerp.<br><br>
-                                We create an effective forward by subtracting the the players forward and the walls forward and getting its magnitude. <br>
-                                The after that we do the same but with a negative wallForward.<br>
-                                deppending on which is bigger we either take negative wallForward or posative wallForward. <br> <br>
-
-                                After we have done all of this we create our target velocity by adding our farward and our groundedMovement form way back, normalize the outcome giving us a direction for this velocity.<br>
-                                Then we just multiply in the effective speed and boom target velocity.<br><br>
-
-                                we do another lerp this between our current velocity to our target.<br>
-                                We take the out come and subtract it with our currentVelocity to get our acceleration and the we set our currentVelocity to be the outcome.<br>
-                            </div>
-                        </div>
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                PlayerCamera.cs
-                            </div>
-                        </div>
-                        <div class="TextBox">
-                            <div class="Text">
-                                This this the class that handles the players camera.<br>
-                                I think you could have understoud that by the name but I diagrees.<br><br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                        public void Initialize(Transform target)<br>
-                                        {<br>
-                                            transform.position = target.position;<br>
-                                            transform.rotation = target.rotation;<br><br>
-                                        
-                                            transform.eulerAngles = _eulerAngles = target.eulerAngles;<br>
-                                        }<br><br>
-                                    
-                                        public void UpdateRotation(CameraInput input)<br>
-                                        {<br>
-                                            _eulerAngles += new Vector3(-input.lookVec.y, input.lookVec.x) * sensitvity;<br>
-                                            _eulerAngles.x = Mathf.Clamp(_eulerAngles.x, -89.0f, 89.0f);<br>
-                                            transform.eulerAngles = _eulerAngles;<br>
-                                        }<br><br>
-                                    
-                                        public void UpdatePosition(Transform target)<br>
-                                        {<br>
-                                            transform.position = target.position;<br>
-                                        }<br>
-                                    </code>
-                                </div>
-                                Its not a lot of code but the basic jist is just that the camera fallows the target that is set on the player.<br>
-                                And updates the cameras rotation based on the input from the mouse, we do clamp the max x value between -89 and 89 so you cant do cart wheels with the mouse break stuff<br>
-
-                            </div>
-                        </div>
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                CameraSpring.cs
-                            </div>
-                        </div>
-                        <div class="TextBox">
-                            <div class="Text">
-                                Now this looks werid. But let me explain <br>
-                                See our structure in the gmae goes<br>
-                                Player -> HOLDS: Character and Camera<br><br>
-                                Character -> HOLDS: root and Camera Target ( remeber this? )<br>
-                                root -> HOLDS: the player Capsule<br><br>
-                                Camera -> HOLDS: Spring<br>
-                                Spring -> HOLDS: The acutal camera and AttackBoxCenter<br><br>
-                                So this script sits on the spring and the previus script sits on the Camera.<br>
-                                The Camera is moving towards the target. <br>
-                                And the spring is a child of the camera with the actual camera as its child<br><br>
-                                <div class="codeCase">
-                                    <code class="CPPCode">
+                                   <code class="CPPCode">
                                         public void UpdateSpring(float deltaTime, Vector3 up)<br>
                                         {<br>
-                                            transform.localPosition = Vector3.zero;<br><br>
-                                        
-                                            Spring(ref _springPosition, ref _springVelocity, transform.position, halfLife, frequency, deltaTime);<br><br>
-                                        
-                                            var localSpringPosition = _springPosition - transform.position;<br>
-                                            var springHeight = Vector3.Dot(localSpringPosition, up);<br><br>
-                                        
-                                            transform.localEulerAngles = new Vector3(-springHeight * angularDisplacement, 0.0f, 0.0f);<br>
-                                            transform.localPosition = _springPosition * linearDisplacement;<br>
-                                        }<br><br>
-                                    
-                                        private static void Spring(ref Vector3 current, ref Vector3 velocity, Vector3 target, float halfLife, float frequency, float timeStep)<br>
-                                        {<br>
-                                            var dampingRatio = -Mathf.Log(0.5f) / (frequency * halfLife);<br>
-                                            var f = 1.0f + 2.0f * timeStep * dampingRatio * frequency;<br>
-                                            var oo = frequency * frequency;<br>
-                                            var hoo = timeStep * oo;<br>
-                                            var hhoo = timeStep * hoo;<br>
-                                            var detInv = 1.0f / (f + hoo);<br>
-                                            var detX = f * current + timeStep * velocity + hhoo * target;<br>
-                                            var detV = velocity + hoo * (target - current);<br>
-                                            current = detX * detInv;<br>
-                                            velocity = detV * detInv;<br>
-                                        }<br>
-                                    </code>
-                                </div>
-                                So in update spring we are moving the local postion of the spring around usuing a custom function called spring.<br>
-                                So eventougth they are order as they are I'm going to sawp my explation oreder.<br>
-                                Now this is a lot of math to go througth so hold my hand cus im going to need it.<br>
-                                Lets start with what each of these inputs are;<br>
-                                1. current, is the current postion<br>
-                                2. velocity, is the current velocity we are traveling at towards the target <br>
-                                3. target, is where we want to be <br>
-                                4. halfLife, how long it takes for the strength to reach half <br>
-                                5. frequency, how quickly the spring resonates <br><br>
-                                if you want to learn more here is <a class="link" href="http://allenchou.net/2015/04/game-math-precise-control-over-numeric-springing/"> <b> the papper</b></a>.<br>
-                                Cus I can not under any cercumstances do this well.<br>
-                                But this function leads to a very smooth camera exepericance. It has some bouncyness to it.<br><br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                transform.localPosition = Vector3.zero;<br><br>
 
-                                Updating the spring is really easy<br>
-                                it just updates the spring postion and rotation in the local space.<br>
-                            </div>
-                        </div>
-                       <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                cameraLean.cs
-                            </div>
-                        </div>
-                        <div class="TextBox">
-                            <div class="Text">
-                                this updates the spring as well but instead of in how it fallows the player it leans the camera in reactive ways deppending on your speed and what mode you are in <br>
+                                                <b style="color: rgb(129, 201, 216);">Spring</b>(ref _springPosition, ref _springVelocity, transform.position, halfLife, frequency, deltaTime);<br><br>
+
+                                                var localSpringPosition = _springPosition - transform.position;<br>
+                                                var springHeight = Vector3.Dot(localSpringPosition, up);<br><br>
+
+                                                transform.localEulerAngles = new Vector3(-springHeight * angularDisplacement, 0.0f, 0.0f);<br>
+                                                transform.localPosition = _springPosition * linearDisplacement;<br>
+                                            </blockquote>
+                                        }<br>
+                                   </code>
+                                </div>
+                                The update <b style="color: rgb(129, 201, 216);">spring</b> function looks like this. <br>
+                                Fairly normal.<br>
+                                Let's move to the line that says <b style="color: rgb(129, 201, 216);">Spring</b>.<br>
+                                <b style="color: rgb(129, 201, 216);">Spring</b> is a custom math function that looks like this.<br>
+                                <div class="codeCase">
+                                   <code class="CPPCode">
+                                         private static void <b style="color: rgb(129, 201, 216);">Spring</b>(ref Vector3 current, ref Vector3 velocity, Vector3 target, float halfLife, float frequency, float timeStep)<br>
+                                        {<br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                var dampingRatio = -Mathf.Log(0.5f) / (frequency * halfLife);<br>
+                                                var f = 1.0f + 2.0f * timeStep * dampingRatio * frequency;<br>
+                                                var oo = frequency * frequency;<br>
+                                                var hoo = timeStep * oo;<br>
+                                                var hhoo = timeStep * hoo;<br>
+                                                var detInv = 1.0f / (f + hoo);<br>
+                                                var detX = f * current + timeStep * velocity + hhoo * target;<br>
+                                                var detV = velocity + hoo * (target - current);<br>
+                                                current = detX * detInv;<br>
+                                                velocity = detV * detInv;<br>
+                                            </blockquote>
+                                        }<br>
+                                   </code>
+                                </div>
+                                Now for the life of me I can not explain this well at all. <br>
+                                But I will show you what this does below. <br><br>
+                                // make script showing this off here dumbass<br><br>
+
+                                if you want to learn more about this then <b><a href="https://allenchou.net/2015/04/game-math-precise-control-over-numeric-springing/" class="link">here</a></b> is the paper on it. <br><br>
+
+                                But the effect as you can see is a more “bouncy” camera.<br>
+                                Adding a nice effect to it.<br><br>
+
+                                The rest of the UpdateSpring function just updates the <b style="color: rgb(129, 201, 216);">Spring</b>'s local position and local rotation.<br><br>
+
+                                Let's look at the other script called <b style="color:rgb(255, 233, 0);">*</b><b style="color: rgb(226, 142, 142);">cameraLean.cs</b><b style="color:rgb(255, 233, 0);">*</b><br><br>
+
+                                Its update <b style="color: rgb(129, 201, 216);">Spring</b> function looks like this<br><br>
 
                                 <div class="codeCase">
                                     <code class="CPPCode">
                                         public void UpdateSpring(float deltaTime, bool sliding, Vector3 acceleration, Vector3 up)<br>
                                         {<br>
-                                            var planarAcceleration = Vector3.ProjectOnPlane(acceleration, up);<br>
-                                            var damping = planarAcceleration.magnitude > _dampedAcceleration.magnitude ? attackDamping : decaykDamping;<br><br>
-                                        
-                                            _dampedAcceleration = Vector3.SmoothDamp(<br>
-                                                current: _dampedAcceleration,<br>
-                                                target: planarAcceleration,<br>
-                                                currentVelocity: ref _dampedAccelerationVel,<br>
-                                                smoothTime: damping,<br>
-                                                maxSpeed: float.PositiveInfinity,<br>
-                                                deltaTime: deltaTime<br>
-                                            );<br><br>
-                                        
-                                            var leanAxis = Vector3.Cross(_dampedAcceleration.normalized, up);<br><br>
-                                        
-                                            transform.localRotation = Quaternion.identity;<br><br>
-                                        
-                                            var targetStrength = sliding ? slideStrength : walkStrength;<br><br>
-                                        
-                                            _smoothStrength = Mathf.Lerp(_smoothStrength, targetStrength, 1.0f - Mathf.Exp(-strengthResponse * deltaTime));<br><br>
-                                        
-                                            transform.rotation = Quaternion.AngleAxis(-_dampedAcceleration.magnitude * _smoothStrength, leanAxis) * transform.rotation;<br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+
+                                                var planarAcceleration = Vector3.ProjectOnPlane(acceleration, up);<br>
+                                                var damping = planarAcceleration.magnitude > <b style="color:rgb(221, 186, 71)">_dampedAcceleration</b>.magnitude ? attackDamping : decaykDamping;<br><br>
+                                                
+                                                <b style="color:rgb(221, 186, 71)">_dampedAcceleration</b> = Vector3.SmoothDamp(<br>
+                                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                    current: <b style="color:rgb(221, 186, 71)">_dampedAcceleration</b>,<br>
+                                                    target: planarAcceleration,<br>
+                                                    currentVelocity: ref _dampedAccelerationVel,<br>
+                                                    smoothTime: damping,<br>
+                                                    maxSpeed: float.PositiveInfinity,<br>
+                                                    deltaTime: deltaTime<br>
+                                                </blockquote>
+                                                );<br><br>
+                                                
+                                                var leanAxis = Vector3.Cross(<b style="color:rgb(221, 186, 71)">_dampedAcceleration</b>.normalized, up);<br><br>
+                                                
+                                                <b style="color:coral">transform.localRotation = Quaternion.identity;</b><br><br>
+                                                
+                                                var <b style="color:rgb(209, 40, 40)">targetStrength</b> = sliding ? slideStrength : walkStrength;<br><br>
+                                                
+                                                _smoothStrength = Mathf.Lerp(_smoothStrength, <b style="color:rgb(209, 40, 40)">targetStrength</b>, 1.0f - Mathf.Exp(-strengthResponse * deltaTime));<br><br>
+                                                
+                                                transform.rotation = Quaternion.AngleAxis(-<b style="color:rgb(221, 186, 71)">_dampedAcceleration</b>.magnitude * _smoothStrength, leanAxis) * transform.rotation;<br>
+                                            </blockquote>
                                         }<br>
                                     </code>
                                 </div>
-                                First we get the acceleration of the player and project it onto a plane using just an up vector.<br>
-                                Then we get what dappening we want just by checking witch magnitude between the acceleratrion we just made is and dampedAcceleration <br>
-                                then we use the function SmoothDamp to get what _dampedAcceleration should be. This gradualy changes the _dampedAcceleration towards the planarAcceleration<br>
-                                now we make a cross between this _dampedAcceleration and up, this gets us our right vector <br>
-                                We set our transform.localRotation to be equal to a Quaternion.identity, this aligns us with the world axis<br>
-                                We get the target strength depending on if we are sliding or not<br>
-                                Then we smoothly lerp this our current strength towards this target <br>
-                                Then we just rotate around the lean axis with the _dampedAcceleration negative magnitude multiple by the smoothen out strength. Multply all of that with our roation and boom we get this.<br>
-                                <div class="imagecontrainer">
-                                    <div class="Imgae" style="max-width: 1000px;">
-                                        <video style="width: 100%; height: 100%;" controls>
-                                            <source src="https://github.com/Plantds/Plantds.github.io/raw/refs/heads/main/pages/MIU/MIU_Vid/Lean.mp4?raw=true" type="video/mp4">
-                                        </video>
+
+                                So what does this function do and why do we do it? <br>
+                                Well the function starts by taking the player's current acceleration and projecting it onto the up direction of the <b style="color:rgb(218, 122, 218)">target</b>.<br>
+                                We use this acceleration twice.<br>
+                                Once to get the damping we want.<br>
+                                The other time we put it into the SmoothDamp vector3 function that unity has.<br><br>
+
+                                Now that we have done this we have our <b style="color:rgb(221, 186, 71)">_dampedAcceleration</b>. <br>
+                                We use this acceleration twice as well. <br>
+                                First we use it in a cross product between our up and acceleration.<br>
+                                This creates what axis we are going to lean on.<br>
+                                Think of it like this: if we are accelerating forwards then we want the camera to lean back.<br>
+                                To create the effect that the player is being pushed by the wind down. <br>
+                                This is also adaptive to whatever else we put in.<br>
+                                If we add a bit of strafing to this we will lean along with it. <br><br>
+
+                                In <b style="color:coral">transform.localRotation = Quaternion.identity;</b> we are setting the rotation of the local transform to be the same as the parents transform.<br><br>
+
+                                We get the <b style="color:rgb(209, 40, 40)">targetStrength</b> out and slap it into a lerp. <br>
+                                Lerping how strong the effect is over time. <br><br>
+
+                                Lastly we apply the rotation.<br>
+                                With this we now have this effect.<br><br>
+
+                                // Video of the lean effect<br><br>
+
+                                That's how the player's camera works. <br>
+                                It's simple but it's really useful.<br>
+                                It's good to add fluff to make the game feel good as well as look good. <br><br>
+
+                                This covers all camera scripts but where are all of these updated?<br>
+                                Well inside of the players late update.<br>
+                                Let me show you that before we move on to the <b style="color: rgb(172, 112, 228);">PlayerCharacter.cs</b>.<br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        void LateUpdate()<br>
+                                        {<br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                var <b style="color: rgb(19, 105, 19);">deltaTime</b> = Time.<b style="color: rgb(19, 105, 19);">deltaTime</b>;<br>
+                                                var <b style="color:rgb(218, 122, 218)">cameraTarget</b> = playerCharacter.getCameraTarget();<br>
+                                                var state = playerCharacter.GetState();<br><br>
+                                                
+                                                <b style="color: rgb(142, 142, 226);">PlayerCamera</b>.UpdatePosition(<b style="color:rgb(218, 122, 218)">cameraTarget</b>);<br>
+                                                <b style="color: rgb(142, 226, 167);">CameraSpring</b>.UpdateSpring(<b style="color: rgb(19, 105, 19);">deltaTime</b>, <b style="color:rgb(218, 122, 218)">cameraTarget</b>.up);<br>
+                                                <b style="color: rgb(226, 142, 142);">cameraLean</b>.UpdateSpring(<b style="color: rgb(19, 105, 19);">deltaTime</b>, <b style="color: rgb(35, 145, 179);">state.Stance is Stance.sliding</b>, <b style="color: orangered;">state.Acceleration</b>, <b style="color:rgb(218, 122, 218)">cameraTarget</b>.up);<br>
+                                            </blockquote>
+                                        }<br>
+                                    </code>
+                                </div>
+                                
+                                Here is where you can see what all of these are getting their inputs. <br>
+                                Let's go top to bottom.  <br> <br>
+
+                                <b style="color: rgb(142, 142, 226);">PlayerCamera</b>, only cares about getting the <b style="color:rgb(218, 122, 218)">target</b> <br> <br>
+
+                                <b style="color: rgb(142, 226, 167);">CameraSpring</b>, wants both delta time and the <b style="color:rgb(218, 122, 218)">target</b>'s up vector. <br>
+                                Remember it needed the up vector to calculate the springHeight.  <br>
+                                <b style="color: rgb(19, 105, 19);">deltaTime</b> was used for the spring function. <br><br>
+
+                                <b style="color: rgb(226, 142, 142);">cameraLean</b>, needs the most out of all of them.  <br>
+                                <b style="color: rgb(19, 105, 19);">deltaTime</b> for is lerp and damping functions. <br>
+                                “<b style="color: rgb(35, 145, 179);">state.Stance is Stance.sliding</b>” just translates to a bool, which is true if you are sliding, otherwise it's false. <br>
+                                <b style="color: orangered;">state.Acceleration</b>, for the current acceleration. <br>
+                                Lastly <b style="color:rgb(218, 122, 218)">cameraTarget</b>.up, for axis calculation and acceleration projection.  <br> <br>
+
+                                That is almost everything <b style="color:rgb(255, 233, 0);">*</b>camera<b style="color:rgb(255, 233, 0);">*</b> related to this project.  <br>
+                                But we will move on here to <b style="color: rgb(172, 112, 228);">PlayerCharacter.cs</b>
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div style="justify-content: center; display: flex;">
+                                <div class="MinorTitle">
+                                    PlayerCharacter
+                                </div>
+                            </div>
+                            <div class="Text">
+                                So this will be long, like the longest part of the player long. <br>
+                                <b style="color: rgb(172, 112, 228);">PlayerCharacter.cs</b> handles all of the movement stuff. <br>
+                                So what is the difference between the <b style="color: rgb(172, 112, 228);">PlayerCharacter</b> and the Player scripts?<br>
+                                Well let's look back at the hierarchy first.<br>
+                                <div class="codeCase">
+                                   <code class="CPPCode">
+                                        <p style="margin: 0%; text-align: center;">
+                                            Player → <b style="color:rgb(125, 228, 112)">Player.cs</b> <br>
+                                            ↓<br>
+                                            Character → KinematicCharacterMotor.cs <br>
+                                            & <b style="color: rgb(172, 112, 228);">PlayerCharacter.cs</b> & CutAndParry.cs
+                                       </p>
+                                        <div style="margin: 0%; display: flex; justify-content: center;">
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                               ↓          
+                                           </p>
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                               ↓
+                                           </p>
+                                       </div>
+                                       <div style="margin: 0%; display: flex; justify-content: center;">
+                                           <p style="margin: 0%; width: 50%; text-align: center;">
+                                                Root // holds visual components of the player <br>
+                                                ↓ <br>
+                                                Capsule // The visual of the player <br>
+                                           </p>
+                                           <p style="margin: 0%; text-align: center; width: 50%;">
+                                            <b style="color:rgb(218, 122, 218)">Camera Target // the target the camera is going towards</b><br>
+                                           </p>
+                                       </div>
+                                   </code>
+                                </div>
+                                So they are separated by hierarchy. <br>
+                                So what are their internal differences? <br>
+                                Well the <b style="color:rgb(125, 228, 112)">Player.cs</b> handles delegation.<br>
+                                Remember how the camera got all of its updates from the <b style="color:rgb(125, 228, 112)">Player.cs</b> script well Player.cs does that for all of the player stuff.<br>
+                                Inputs and updates are its domain. <br>
+                                It gets information and delegates it down to the other scripts as needed.<br><br>
+
+                                KinematicCharacterMotor.cs is what I am working with here. <br>
+                                Remember this is a specialisation project and I wanted to learn more about making movements in unity. <br>
+                                Using this motor was the point of this. <br><br>
+
+                                CutAndParry.cs is something I didn't finish but you'll get to see later. <br>
+                                (This thing builds towards a project im working on now <b style="color:rgb(255, 233, 0);">*</b>After Cut<b style="color:rgb(255, 233, 0);">*</b>)<br><br>
+
+                                Now because <b style="color: rgb(172, 112, 228);">PlayerCharacter.cs</b>  is where movement is handled, so it is working a lot with the motor.<br>
+                                I will be going movement by movement.<br>
+                                We will look at 3 functions <b style="color: rgb(68, 184, 97);">BeforeCharacterUpdate</b>, <b style="color:rgb(184, 68, 78)">AfterCharacterUpdate</b> and <b style="color:rgb(68, 132, 184)">UpdateVelocity</b>.<br>
+                                There are like 17 functions in here but the other 14 functions are things like UpdateInput and UpdateBody.<br>
+                                They don't do enough interesting stuff or in interesting ways for me to show off.<br><br>
+
+                                Well will go in this order <b style="color: rgb(68, 184, 97);">BeforeCharacterUpdate</b> → <b style="color:rgb(68, 132, 184)">UpdateVelocity</b> → <b style="color:rgb(184, 68, 78)">AfterCharacterUpdate</b>.<br>
+                                <b style="color: rgb(68, 184, 97);">BeforeCharacterUpdate</b>, happens before velocity and physics are calculated.<br>
+                                <b style="color:rgb(68, 132, 184)">UpdateVelocity</b>, is called before the motor does its thing.<br>
+                                <b style="color:rgb(184, 68, 78)">AfterCharacterUpdate</b>, is called when the motor wants to finish up everything in the update cycle.<br><br>
+
+                                Now lets actually start<br>
+                                <div class="codeCase">
+                                   <code class="CPPCode">
+                                    public void BeforeCharacterUpdate(float deltaTime)<br>
+                                    {<br>
+                                        <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                            _tempState = _state;<br><br>
+                                            
+                                            if (_requestedRun && _state.Stance is Stance.Stand && !_requestedCrouch)<br>
+                                            {<br>
+                                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                    _state.Stance = Stance.Running;<br>
+                                                </blockquote>
+                                            }<br><br>
+                                            
+                                            if (_requestedCrouch && (_state.Stance is Stance.Stand || _state.Stance is Stance.Running))<br>
+                                            {<br>
+                                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+
+                                                    _state.Stance = Stance.Crouch;<br>
+                                                    motor.SetCapsuleDimensions(<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                        radius: motor.Capsule.radius,<br>
+                                                        height: crocuhHight,<br>
+                                                        yOffset: crocuhHight * 0.5f<br>
+                                                    </blockquote>
+                                                    );<br><br>
+                                                    
+                                                    root.localPosition = new Vector3(0.0f, 0.5f, 0.0f);<br>
+                                                </blockquote>
+                                            }<br>
+                                        </blockquote>
+                                    }<br>
+                                   </code>
+                                </div>
+                                This is only really handling 2 things.<br>
+                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                    1. If you are running or if you are crouching.<br>
+                                    2. What height you should be.<br><br>
+                                </blockquote>
+                                We do this here because a lot of things that come up late, like your velocity, is dependent on your state. <br><br>
+                                                            
+                                Now let's look at the big boy and the thing I'm going to be dividing up into movement mode segments.<br><br>
+                                                            
+                                There are 7 different movement modes<br><br>
+                                3 of which are;<br>
+                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                    1. sliding<br>
+                                    2. wallruning<br>
+                                    3. dashing<br><br>
+                                </blockquote>
+                                The rest are <br>
+                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                    1. Standing, as in standing still<br>
+                                    2. Crouching<br>
+                                    3. Running<br>
+                                    4. airborn, being in air<br><br>
+                                </blockquote>
+                                As you can tell, it's a bit less interesting.<br>
+                                So I will be going through the first 3.<br>
+                                Starting with;<br>
+
+                                <div style="justify-content: center; display: flex;">
+                                    <div class="MinorTitle" style="font-size: 23px;">
+                                        Slide
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                cutAndParry.cs
-                            </div>
-                        </div>
-
-                        <div class="TextBox">
-                            <div class="Text">
-                                cutAndParry is my attack code, its made to handle the players weapon with would be a simple sword.<br>
-                                I didnt get to far on this but I am remaking this in a project called AfterCut but that is in unreal. <br><br>
-                                We have 3 function in here that have actual code, there is a 4th one but that one is empty and was going to be a parry mechanic <br>
-                                 <div class="codeCase">
-                                    <code class="CPPCode">
-                                        public void UpdateWeaponInput(weaponInput input) //doubles as normal update<br>
-                                        {<br>
-                                            _requestedCut = input.Cut;<br>
-                                            _requestedParry = input.Parry;<br>
-                                            _requestedSheath = input.Sheath;<br>
-                                            _betweenCutsTimer -= Time.deltaTime;<br>
-                                            if (_requestedCut && _betweenCutsTimer < 0.0f) Cut();<br><br>
-                                        
-                                            _sheathTimer -= Time.deltaTime;<br>
-                                            if (_requestedSheath && _sheathTimer < 0.0f) { _sheathTimer = sheathSpeed; _storedSheath = true; }<br>
-                                            if (_sheathTimer < 0.0f && _storedSheath) Sheath();<br><br>
-                                        
-                                            _enemiesCount = _enemies is null ? 0 : _enemies.Count();<br>
-                                        }<br>
-                                    </code>
-                                </div>
-                                Here we are taking in inputs and checking times nothing new. I do have a werid line in here<br>
-                                "_enemiesCount = _enemies is null ? 0 : _enemies.Count()" I think this is just a safty net for if the _enimes doesnt exist but i make it in Initialize so this is just odd<br><br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                         private void Cut()<br>
-                                        {<br>
-                                            _betweenCutsTimer = timeBetweenCuts;<br>
-                                            Vector3 pos = new Vector3(attackBoxCenter.transform.position.x, attackBoxCenter.transform.position.y / 2, attackBoxCenter.transform.position.z);<br>
-                                            var result = this.BoxCast(true, pos, cam.transform.forward, cutBoxSize, cam.transform.rotation, 0.0f, enemy, true);<br>
-                                            for (int i = 0; i < result.Hits.Count() && !_enemies.Exists(x => x.colliderInstanceID == result.Hits[i].colliderInstanceID); i++)<br>
-                                            {<br>
-                                                Debug.Log("observe"); // QUANTUM BALDE WORKS WITH ACTUAL QUANTUM MECHANICS.. somehow<br>
-                                                _enemies.Add(result.Hits[i]);<br>
-                                            }<br>
-                                        }<br>
-                                    </code>
-                                </div>
-                                now this just spawns a box cast infornt of the playe and any enemies inside get added to the list as long as they dont already are a part of the list. <br>
-                                This should be a map.<br>
-                                Worse is im not just saving the enime im saving the racst to it <br>
-                                the debug.log there is also funny, my code decided to not be called untill i did this.<br><br>
-
-                                <div class="codeCase">
-                                    <code class="CPPCode">
-                                            private void Sheath()<br>
-                                            {<br>
-                                                _storedSheath = false;<br>
-                                                foreach (RaycastHit rh in _enemies)<br>
+                                <div class="TextBox">
+                                    <div class="Text">
+                                        <div class="codeCase">
+                                            <code class="CPPCode">
+                                                if (moving && crouching && shouldSlideStart && (wasStanding || wasInAir || wasRuning))<br>
                                                 {<br>
-                                                    rh.collider.gameObject.GetComponent<EnemyScript>().Kill();<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+
+                                                        _state.Stance = Stance.sliding;<br><br>
+                                                        
+                                                        if (wasInAir)<br>
+                                                        {<br>
+                                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                                Vector3 groundNormal = motor.GroundingStatus.GroundNormal;<br>
+                                                                Vector3 tangent = Vector3.ProjectOnPlane(currentVelocity, groundNormal);<br><br>
+                                                                
+                                                                // Keep tangential (momentum along slope), discard into-ground velocity<br>
+                                                                if (tangent.sqrMagnitude > 0.001f)<br>
+                                                                <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                                    currentVelocity = tangent.normalized * currentVelocity.magnitude;<br>
+                                                                </blockquote>
+                                                            </blockquote>
+                                                        }<br><br>
+                                                        
+                                                        float effectiveSlideStartSpeed = slideStartSpeed;<br>
+                                                        if (!_lastState.Grounded && !_requestedCrouchInAir)<br>
+                                                        {<br>
+                                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                                effectiveSlideStartSpeed = 0.0f;<br>
+                                                                _requestedCrouchInAir = false;<br>
+                                                            </blockquote>
+                                                            }<br><br>
+                                                        
+                                                        float slideSpeed = Mathf.Max(effectiveSlideStartSpeed, currentVelocity.magnitude);<br>
+                                                        currentVelocity = motor.GetDirectionTangentToSurface(<br>
+                                                        <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                            direction: currentVelocity,<br>
+                                                            surfaceNormal: motor.GroundingStatus.GroundNormal) * slideSpeed;<br>
+                                                        </blockquote>
+                                                    </blockquote>
                                                 }<br>
-                                                _enemies.Clear();<br>
-                                            }<br>
-                                    </code>
-                                </div>
-                                This is a simple kill all enimes after youve sheath your blade, so I dont kill them on hit I kill them on this call.<br>
-                                I did this way better in the new AfterCut<br><br>
+                                            </code>
+                                        </div>
+                                        NOTE: this is all happeing only if you are currently grounded. <br><br>
 
-                                That is everything on the player<br>
-                            </div>
-                        </div>
+                                        This part of the slide is setting up a few things.<br>
+                                        It sets up the stance and the velocity.<br>
+                                        That's really it. <br>
+                                        What we get out from this function in the end is really just the slide velocity but projected onto the ground the player is standing on.<br>
+                                        By projecting it onto the ground the player is on we get the slide to follow said ground.<br><br>
 
-                    </div>
-                </div>
+                                        The next part of the slide is here<br>
+                                        <div class="codeCase">
+                                            <code class="CPPCode">
+                                                if (_state.Stance is Stance.Stand or Stance.Crouch or Stance.Running){<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                        /// CODE THAT DOESNT MATTER FOR SLIDE<br>
+                                                    </blockquote>
+                                                } else<br>
+                                                {<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                        currentVelocity -= currentVelocity * (<b style="color: rgb(168, 209, 209)">slideFriction</b> * deltaTime);<br><br>
+                                                        
+                                                        Vector3 forceOnSlope = Vector3.ProjectOnPlane(<br>
+                                                        <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                            vector: -motor.CharacterUp,<br>
+                                                            planeNormal: motor.GroundingStatus.GroundNormal<br>
+                                                        </blockquote>
+                                                        ) * <b style="color: rgb(160, 109, 209);">slideGravity</b>;<br><br>
+                                                        
+                                                        currentVelocity -= forceOnSlope * deltaTime;<br><br>
+                                                        
+                                                        float currentSpeed = currentVelocity.magnitude;<br>
+                                                        Vector3 <b style="color:deepskyblue">targetVelocity</b> = <b style="color: rgb(165, 112, 42)">groundedMovement</b> * currentVelocity.magnitude;<br>
+                                                        Vector3 <b style="color: hotpink;">steerVelocity</b> = currentVelocity;<br>
+                                                        Vector3 <b style="color:crimson">steerForce</b> = (<b style="color:deepskyblue">targetVelocity</b> - <b style="color: hotpink;">steerVelocity</b>) * slideSteerAcceleration * deltaTime;<br>
+                                                        <b style="color: hotpink;">steerVelocity</b> += <b style="color:crimson">steerForce</b>;<br>
+                                                        <b style="color: hotpink;">steerVelocity</b> = Vector3.ClampMagnitude(<b style="color: hotpink;">steerVelocity</b>, currentSpeed);<br><br>
+                                                        
+                                                        _state.Acceleration = (<b style="color: hotpink;">steerVelocity</b> - currentVelocity) / deltaTime;<br>
+                                                        currentVelocity = <b style="color: hotpink;">steerVelocity</b>;<br><br>
+                                                        
+                                                        if (currentVelocity.magnitude < slideEndSpeed) _state.Stance = Stance.Crouch;<br>
+                                                    </blockquote>
+                                                }<br>
+                                            </code>
+                                        </div>
+                                        Now this function handles 4 things that are applied to the slide velocity.<br>
+                                        Let's go down the list shall we?<br>
+                                        First we apply <b style="color: rgb(168, 209, 209)">friction</b> to the slide, so that we slowly lose momentum.<br><br>
+                                                                            
+                                        After that we apply <b style="color: rgb(160, 109, 209);">slideGravity</b> forcing the player towards the slope.<br>
+                                        Increasing the amount of force applied based on a projected vector between the players downvector and the ground's normal vector. <br><br>
+                                                                            
+                                        Now we have the strafing part.<br>
+                                        We get the <b style="color:deepskyblue">targetVelocity</b> we want by taking the <b style="color: rgb(165, 112, 42)">groundedMovement</b>, which is our input project onto the ground's normal, and our current velocity's magnitude.<br>
+                                        This basically just changes the direction of our velocity.<br>
+                                        Magnitude has now gotten a new direction. <br><br>
 
-                <div class="Title">
-                    Shader
-                </div>
-                
-                <div class="Card">
-                    <div class="CardInfoContainer">
-                        <div style="width: 100%; height: fit-content; display: flex; justify-content: center;">
-                            <div class="MinorTitle">
-                                core
-                            </div>
-                        </div>
-                        <div class="TextBox">
-                            <div class="Text">
-                                This is the cool shader that I like 
-                                <div class="imagecontrainer">
-                                    <div class="Imgae" style="max-width: 1000px;">
-                                        <img src="MIU_Imges/Shader.png" alt="" style="width: 100%; height: 100%;">
+                                        The <b style="color: hotpink;">steerVelocity</b> we currently have is just our current velocity.<br><br>
+
+                                        The <b style="color:crimson">steerForce</b> is gotten by simply get the difference between our <b style="color: hotpink;">steerVelocity</b> and our <b style="color:deepskyblue">targetVelocity</b> multiplied by our slide acceleration. <br>
+                                        We add this force onto our <b style="color: hotpink;">steerVelocity</b>, we are now basically moving our steer towards our <b style="color:deepskyblue">targetVelocity</b>. <br><br>
+
+                                        Lastly we clamp <b style="color: hotpink;">steerVelocity's</b> magnitude to be that of the <b style="color:deepskyblue">targetVelocity</b>.<br>
+                                        Then we just apply it and update our acceleration. <br><br>
+                                                                            
+                                        Last thing this function does is kick us out of sliding if we get to be too slow.<br><br>
+                                                                            
+                                        That's all for sliding. <br>
+                                        And that was only sliding.<br>
+                                        See why I split it?<br>
                                     </div>
                                 </div>
-                                We just set the angle and it creats an auto red no walk zone.<br>
-                                The first part is we take the vertexs normal vector and doting with the worlds up vector, Arccoine it to get radiance out.<br>
-                                We turn the radiance to degres instead so we can use the outcome in a step node.<br>
-                                Doing this to split up the vertex into two sides. These two sides then get colored either red or white.<br>
-                                The lower part just creates a repeating grid texture. We combine these two shader effects to get this cool shader. <br>
-                                <br>
-                                We can now use this shader to show where the player can and cant walk in the world. I think its really cool and it was something I didnt think of doing until I saw it.<br>
-                                Using shaders as a debug tool in this why just makes me kinda happy, you know.<br>
+                                <div style="justify-content: center; display: flex;">
+                                    <div class="MinorTitle" style="font-size: 23px;">
+                                        Wallruning
+                                    </div>
+                                </div>
+                                <div class="TextBox">
+                                    <div class="Text">
+                                        <div class="codeCase">
+                                            <code class="CPPCode">
+                                            </code>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="justify-content: center; display: flex;">
+                                    <div class="MinorTitle" style="font-size: 23px;">
+                                        Dashing
+                                    </div>
+                                </div>
+                                <div class="TextBox">
+                                    <div class="Text">
+                                        <div class="codeCase">
+                                            <code class="CPPCode">
+                                            </code>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1075,7 +727,7 @@
                             
                     </div>
                 </div>
-                </div>
+            </div>
 
                 <div class="Title">
                     Guns

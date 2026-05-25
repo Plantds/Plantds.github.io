@@ -67,6 +67,18 @@ ul.headerNav li a:visited{
     margin: 10px;
 }
 
+#moveboxbutton{
+    background-color: #04AA6D;
+  border: white;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
 .inputSettings{
     display: grid;
     grid-template-columns: max-content max-content;
@@ -212,6 +224,12 @@ body.body{
     height: 10px;
 }
 
+.quteCode{
+    margin-top: 0%; 
+    margin-bottom: 0%;
+    text-wrap-mode: wrap;
+}
+
 .ABox{
     position: relative;
     justify-content: center;
@@ -220,6 +238,12 @@ body.body{
 }
 
 .BBox{
+    position: relative;
+    justify-content: center;
+    width: 1px;
+}
+
+.TBox{
     position: relative;
     justify-content: center;
     width: 1px;
