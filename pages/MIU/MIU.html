@@ -357,7 +357,7 @@
                         <div class="TextBox">
                             <div style="justify-content: center; display: flex;">
                                 <div class="MinorTitle">
-                                    PlayerCharacter
+                                    PlayerCharacter.cs
                                 </div>
                             </div>
                             <div class="Text">
@@ -606,10 +606,68 @@
                                 </div>
                                 <div class="TextBox">
                                     <div class="Text">
+
                                         <div class="codeCase">
                                             <code class="CPPCode">
+                                                // wallruning <br>
+                                                
+                                                if (!motor.GroundingStatus.IsStableOnGround && _wallrunColdownTimer < 0.0f && _state.Stance is not Stance.Dashing && !_requestedJump && _isGettingMovementInput && (currentVelocity.sqrMagnitude > wallrunFrechold || _state.Stance is Stance.Running) && (rightWall || leftWall))<br>
+                                                {<br>
+                                                    <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                        {// start wallrun<br>
+                                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                                _state.Stance = Stance.Wallruning;<br>
+                                                                _ungrounedDueToJump = false;<br>
+                                                                currentVelocity = new Vector3(currentVelocity.x, 0.0f, currentVelocity.z);<br>
+                                                            </blockquote>
+                                                        }<br>
+                                                        {// during wallrun<br>
+                                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal;<br>
+                                                                Vector3 wallForward = Vector3.Cross(wallNormal, motor.CharacterUp);<br><br>
+                                                                
+                                                                float chosenStartSpeed = Mathf.Max(wallrunStartSpeed, currentVelocity.magnitude);<br>
+                                                                float effectiveWallrunSpeed = Mathf.Lerp(<br>
+                                                                    a: chosenStartSpeed,<br>
+                                                                    b: wallrunEndSpeed,v
+                                                                    t: 1.0f - Mathf.Exp(-walkResponse * deltaTime));<br><br>
+                                                                    
+                                                                    Vector3 effectiveForward = (motor.CharacterForward - wallForward).magnitude > (motor.CharacterForward - -wallForward).magnitude ? -wallForward : wallForward;<br><br>
+                                                                    
+                                                                    Vector3 tragetVelocity = (effectiveForward + groundedMovement).normalized * effectiveWallrunSpeed;<br>
+                                                                    Vector3 moveVelocity = Vector3.Lerp( // not learping shit huh<br>
+                                                                    a: currentVelocity,<br>
+                                                                    b: tragetVelocity,<br>
+                                                                    t: 1.0f - Mathf.Exp(-wallrunResponse * deltaTime)<br>
+                                                                    );<br>
+                                                                    _state.Acceleration = moveVelocity - currentVelocity;<br>
+                                                                    currentVelocity = moveVelocity;<br>
+                                                                </blockquote>
+                                                        }<br>
+                                                    </blockquote>
+                                                    }
                                             </code>
                                         </div>
+                                        This one is long so Ill try my best to condecene it down.<br>
+                                        When wallrunning the effect you want is just pushing the player towards the wall and chaninging the vellocity to fallow it intead of the ground or their forward.<br>
+                                        Some checks are in there to solve for problems like the player looking to far away form the wall.<br>
+                                        We also want the players speed to constanly lowerd as they wallrun and then end the wallrun if they end up going to slowly.<br><br>
+                                        
+                                        So how do we achive this?<br>
+                                        Well lets look att “durring wallrun”<br>
+                                        The first part is getting the the fraward direction we need to be moving.<br>
+                                        A cross procuct of the players up and the walls normal achives this nicely. <br><br>
+                                        
+                                        Then to achive the slowing down of the player we just lerp our start speed towards our end speed.<br>
+                                        We then use this multiplied with the forward we made earlier to get our target velocity. <br>
+                                        We lerp down our current vel towards the traget and then update the acceleretion and the velocity variables. <br><br>
+                                        
+                                        Now you might have noticed the comment “// not lerping shit huh” well this should be working in therory but in practice well<br><br>
+                                        
+                                        // VIDEO OF WALLRUNING, -.-' im not home rn so please imagine a somewhat good video<br><br>
+                                        
+                                        But that is the main part of wallrunning explained. <br>
+                                        Lets now look at the dash.<br>
                                     </div>
                                 </div>
                                 <div style="justify-content: center; display: flex;">
@@ -619,12 +677,78 @@
                                 </div>
                                 <div class="TextBox">
                                     <div class="Text">
+                                        Dash wants to achive one thing; push the player forward with some impulse of speed.<br>
+                                        Now I have 2 verstion of dashing depending  on if you are wallrunning or not.<br>
+                                        Lets look at the not wallruning one first.<br>  
                                         <div class="codeCase">
                                             <code class="CPPCode">
+                                                _state.Stance = Stance.Dashing;<br>
+                                                Vector3 groundedForward = motor.GetDirectionTangentToSurface(direction: motor.CharacterForward, surfaceNormal: motor.GroundingStatus.GroundNormal);<br>
+                                                motor.ForceUnground(time: 0.0f);<br><br>
+                                                
+                                                float effectiveDashSpeed = motor.GroundingStatus.IsStableOnGround ? groundDashSpeed : airDashSpeed;<br><br>
+                                                
+                                                if (groundedMovement.magnitude > 0.0f) currentVelocity += groundedMovement * effectiveDashSpeed;<br>
+                                                else currentVelocity += groundedForward * effectiveDashSpeed;<br>               
                                             </code>
                                         </div>
+                                        So we do 3 things here;<br>
+                                        <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                            1.	We get the forward <br>
+                                            2.	We get the speed <br>
+                                            3.	We apply everything <br>
+                                        </blockquote>
+                                        Getting the forward is easy we callculate the tangent between the players forward and and the ground normal.<br>
+                                        <div class="imagecontrainer">
+                                            <div class="Imgae" style="max-width: 1000px;">
+                                                <img src="MIU_Image/Tangent_to_a_curve.png" alt="" style="width: 100%; height: 100%;">
+                                            </div>
+                                        </div>
+                                        Tangent gets us this line that is dependent on the surface. <br>
+                                        Then we take the direction of this line as our forward.<br><br>
+                                        
+                                        To get the speed we just check if we are currently grounded or not. <br><br>
+                                        
+                                        And then to apply all of this we just check if groundedMovement is currently giving us anything by checking in magnitude.<br>
+                                        groundedMovement tells us if the player is currently giving any input and what direction that input is in.<br>
+                                        So, after that we take the direction, we want to dash in multiplied by the speed we want to add and add it to the current velocity. <br><br>
+                                        
+                                        That’s it for the non wallrun dash.<br>
+                                        <div class="codeCase">
+                                            <code class="CPPCode">
+                                                _state.Stance = Stance.Dashing;<br>
+                                                _wallrunColdownTimer = wallrunColdownTime;<br>
+                                                Vector3 wallNormal = rightWall ? rightHit.normal : leftHit.normal; // normals can at time point towards the wall fuck<br><br>
+
+                                                Vector3 comebinedDir = (wallNormal * 0.3f) + motor.CharacterForward.normalized; <br><br>
+
+                                                currentVelocity = new Vector3(0.0f, currentVelocity.y, currentVelocity.z);<br><br>
+
+                                                currentVelocity += comebinedDir * airDashSpeed;<br>
+                                            </code>
+                                        </div>
+                                        This one is only really different in the direction that is applied and the fact we take currentVelocity and remove the right/left force setting it to 0. <br>
+                                        So to get the direction we take the normal of the wall and the character forward and add them together. <br>
+                                        Note that we are making the input only 30% of its normal size, making it so it affects the outcome way less the direction the player is faceting. <br>
+                                        After that we are doing basically just what we have done before.<br><br>
+                                        
+                                        And that is the dash. <br>
+                                        And everything for the player that I wanted to show.<br><br>
+                                        
+                                        Now let’s see the Player.cs before we move onto the enemy <br>
+                                        
                                     </div>
                                 </div>
+
+                            </div>
+                        </div>
+                        <div class="TextBox">
+                            <div style="justify-content: center; display: flex;">
+                                <div class="MinorTitle">
+                                    Player.cs
+                                </div>
+                            </div>
+                            <div class="Text">
                             </div>
                         </div>
                     </div>
