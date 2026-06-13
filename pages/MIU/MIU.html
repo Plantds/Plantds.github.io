@@ -749,8 +749,50 @@
                                 </div>
                             </div>
                             <div class="Text">
+                                Like said before the Player.cs script handels delegation to the other scripts so im just going to show how it delegates and how inputs are updated.<br>
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        var characterInput = new CharacterInput<br>
+                                        {<br>
+                                            <blockquote style="margin-top: 0%; margin-bottom: 0%;">
+                                                // movement input<br>
+                                                Rotation = playerCamera.transform.rotation,<br>
+                                                Move = input.WASD.ReadValue<<r>Vector2>(),<br>
+                                                    Jump = input.jump.WasPressedThisFrame(),<br>
+                                                    JumpSustain = input.jump.IsPressed(),<br>
+                                                    Crouch = toggleCrouchSlide ? (input.crouch_slide.WasPressedThisFrame() ? CrouchInput.toggle : CrouchInput.None) : (input.crouch_slide.IsPressed() ? CrouchInput.Crouch : CrouchInput.Uncrouch),<br>
+                                                    Run = toggleRun ? (input.run.WasPressedThisFrame() ? RunInput.toggle : RunInput.None) : (input.run.IsPressed() ? RunInput.Run : RunInput.Unrun),<br>
+                                                    Dash = input.dash.WasPressedThisFrame(),<br>
+                                            </blockquote>
+                                        };<br>                            
+                                    </code>
+                                </div>
+
+                                Here a new character input is created and information filled in based on what the player is doing. <br>
+                                Lets look at a single line of this as that will be enough to explain most of what is happening here. <br><br>
+
+                                We do it like this because this means that all our calculations uses the same data.<br>
+                                From the players rotation to the inputs, all of it is the same across all of the math we are doing.<br>
+                               
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        Run = toggleRun ? (input.run.WasPressedThisFrame() ? RunInput.toggle : RunInput.None) : (input.run.IsPressed() ? RunInput.Run : RunInput.Unrun),<br>
+                                    </code>
+                                </div>
+
+                                Run is just a bool that is asking if a certain input was pressed this frame or not.<br>
+                                But run is also a togglable value so there is a check for that as well.<br>
+                                All of these inputs is then used down the line mainly as you saw in the character and camera.<br>
+
+                                <div class="codeCase">
+                                    <code class="CPPCode">
+                                        playerCharacter.UpdateInput(characterInput);<br>
+                                        playerCharacter.UpdateBody(deltaTime);<br>
+                                    </code>
+                                </div>
                             </div>
                         </div>
+                        thta
                     </div>
                 </div>
 
